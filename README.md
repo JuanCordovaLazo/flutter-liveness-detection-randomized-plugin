@@ -10,12 +10,21 @@ A Flutter plugin for liveness detection with randomized challenge response metho
 
 Crafted with love by **[Bagus Subagja](https://www.linkedin.com/in/bagussubagja/)** ❤️
 
-Feel free to fork and modify this package to suit your needs - that's much more enjoyable than stealing or claiming my code 😊
+Feel free to fork and modify this package to suit your needs - that's much more enjoyable and respectful 😊
 
 ## Preview 🪟
 ![Slide 16_9 - 1](https://github.com/user-attachments/assets/55e59d51-e0da-4562-879e-ae50adaced33)
 
 https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
+
+## Update 1.2.1
+- ⬆️ **Kotlin updated to 2.1.0** for better performance and support 16KB google page size policy
+- ⬆️ compileSdk & targetSdk bumped to **36** (Android 16)
+- ☕ Java & Kotlin JVM target upgraded to **VERSION_17**
+- 📱 minSdk raised to **24** (Android 7.0)
+- 🗑️ Removed `useLegacyPackaging` — no longer needed with modern AGP
+- 🔍 `google_mlkit_face_detection` updated to **0.13.2**
+- 🐦 Flutter minimum version bumped to **3.38.7**
 
 ## Update 1.1.0
 - ⏱️ Added automatic cooldown feature after 3 failed verification attempts
@@ -50,7 +59,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_liveness_detection_randomized_plugin: ^1.1.0
+  flutter_liveness_detection_randomized_plugin: ^1.2.1
 ```
 
 ## Usage 🚀
@@ -183,7 +192,7 @@ Add camera permission to your `android/app/src/main/AndroidManifest.xml`:
 ```xml
 <uses-permission android:name="android.permission.CAMERA"/>
 ```
-Minimum SDK version: 23
+Minimum SDK version: 24
 
 ### iOS
 Add camera usage description to `ios/Runner/Info.plist`:

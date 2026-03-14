@@ -1,8 +1,8 @@
 group = "com.bagussubagja.flutter_liveness_detection_randomized_plugin.flutter_liveness_detection_randomized_plugin"
-version = "1.0-SNAPSHOT"
+version = "1.2.1"
 
 buildscript {
-    ext.kotlin_version = "1.8.22"
+    ext.kotlin_version = "2.1.0"
     repositories {
         google()
         mavenCentral()
@@ -29,21 +29,15 @@ android {
         namespace = "com.bagussubagja.flutter_liveness_detection_randomized_plugin.flutter_liveness_detection_randomized_plugin"
     }
 
-    compileSdk = 34
+    compileSdk = 36
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    packagingOptions {
-      jniLibs {
-        useLegacyPackaging true
-      }
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     sourceSets {
@@ -52,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 21
+        minSdk = 24
     }
 
     dependencies {

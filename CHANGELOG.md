@@ -1,3 +1,16 @@
+# 1.2.1 🚀
+
+## Improvements
+- ⬆️ **Kotlin updated to 2.1.0** for better performance and support 16KB google page size policy
+- ⬆️ **compileSdk & targetSdk bumped to 36** (Android 16)
+- ☕ **Java & Kotlin JVM target upgraded to VERSION_17**
+- 📱 **minSdk raised to 24** (Android 7.0)
+- 🗑️ **Removed `useLegacyPackaging`** — no longer needed with modern AGP
+- 🔍 **google_mlkit_face_detection updated to 0.13.2** for improved face detection accuracy
+- 🐦 **Flutter minimum version bumped to 3.38.7**
+
+---
+
 # 1.1.0 🚀
 
 ## BREAKING CHANGES
