@@ -19,6 +19,7 @@ class LivenessDetectionView extends StatefulWidget {
 
 class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   static const int _faceLossGraceFrames = 3;
+  static const Duration _frameProcessingInterval = Duration(milliseconds: 100);
 
   // Camera related variables
   CameraController? _cameraController;
@@ -35,6 +36,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   DateTime? _lookForwardHoldStartedAt;
   XFile? _capturedChallengeImage;
   int _faceLossFrameCount = 0;
+  DateTime? _lastFrameProcessedAt;
 
   // Brightness Screen
   Future<void> setApplicationBrightness(double brightness) async {
@@ -185,6 +187,8 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   }
 
   Future<void> _processCameraImage(CameraImage cameraImage) async {
+    if (_isBusy || !_shouldProcessNextFrame()) return;
+
     final camera = availableCams[_cameraIndex];
     final imageRotation = InputImageRotationValue.fromRawValue(
       camera.sensorOrientation,
@@ -226,8 +230,18 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
 
     if (inputImage != null) {
+      _lastFrameProcessedAt = DateTime.now();
       _processImage(inputImage);
     }
+  }
+
+  bool _shouldProcessNextFrame() {
+    final DateTime now = DateTime.now();
+    if (_lastFrameProcessedAt == null) {
+      return true;
+    }
+
+    return now.difference(_lastFrameProcessedAt!) >= _frameProcessingInterval;
   }
 
   Future<void> _processImage(InputImage inputImage) async {
@@ -251,11 +265,11 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
         if (shouldReset) {
           _resetSteps();
-          if (mounted) setState(() => _faceDetectedState = false);
+          _setFaceDetectedState(false);
         }
       } else {
         _faceLossFrameCount = 0;
-        if (mounted) setState(() => _faceDetectedState = true);
+        _setFaceDetectedState(true);
         final currentIndex = _stepsKey.currentState?.currentIndex ?? 0;
         List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
         if (currentIndex < currentSteps.length) {
@@ -268,7 +282,15 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
 
     _isBusy = false;
-    if (mounted) setState(() {});
+  }
+
+  void _setFaceDetectedState(bool isDetected) {
+    if (_faceDetectedState == isDetected || !mounted) {
+      _faceDetectedState = isDetected;
+      return;
+    }
+
+    setState(() => _faceDetectedState = isDetected);
   }
 
   void _detectFace({
@@ -323,7 +345,6 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
       await _takePicture(continueFlow: true);
     }
 
-    if (mounted) setState(() {});
     await _stepsKey.currentState?.nextPage();
 
     _stopProcessing();
@@ -423,17 +444,9 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   }
 
   void _resetSteps() {
-    List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
     _resetLookForwardHold();
     _capturedChallengeImage = null;
     _faceLossFrameCount = 0;
-
-    for (var step in currentSteps) {
-      final index = currentSteps.indexWhere((p1) => p1.step == step.step);
-      if (index != -1) {
-        currentSteps[index] = currentSteps[index].copyWith();
-      }
-    }
 
     if (_stepsKey.currentState?.currentIndex != 0) {
       _stepsKey.currentState?.reset();

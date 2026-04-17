@@ -7,16 +7,16 @@ class MachineLearningKitHelper {
 
   final FaceDetector faceDetector = FaceDetector(
     options: FaceDetectorOptions(
-      enableContours: true,
+      enableContours: false,
       enableClassification: true,
-      enableLandmarks: true,
-      enableTracking: true,
+      enableLandmarks: false,
+      enableTracking: false,
       performanceMode: FaceDetectorMode.accurate,
     ),
   );
 
   Future<List<Face>> processInputImage(InputImage imgFile) async {
-    const maxAttempts = 3;
+    const maxAttempts = 1;
 
     for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
