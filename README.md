@@ -90,6 +90,7 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     isEnableSnackBar: true, // Show result notifications
     mustShuffle: true, // Shuffle enabled challenges
     lastChallenge: LivenessDetectionStep.lookForward, // Optional fixed last challenge
+    takePhotoOnChallenge: LivenessDetectionStep.lookForward, // Optional challenge that triggers the photo capture
     shuffleListWithSmileLast: true, // Deprecated legacy alias for smile last
 
     // Customization
@@ -133,6 +134,7 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
 - `isEnableSnackBar`: Show success/failure notifications (default: true)
 - `mustShuffle`: Shuffle the effective challenge list (default: true)
 - `lastChallenge`: Optional fixed last challenge from `LivenessDetectionStep`
+- `takePhotoOnChallenge`: Optional challenge that triggers the photo capture; if absent from the effective list, the plugin falls back to the final effective challenge
 - `shuffleListWithSmileLast`: Deprecated legacy alias for `lastChallenge: LivenessDetectionStep.smile`
 
 ### Customization
@@ -171,7 +173,9 @@ You can customize challenge labels or skip certain challenges:
 - Use `mustShuffle: false` to preserve the effective order exactly as declared by the configured challenge list.
 - Use `mustShuffle: true` to shuffle all enabled challenges.
 - Use `lastChallenge` to pin a single enabled challenge to the final position without duplication.
+- Use `takePhotoOnChallenge` to decide on which effective challenge the plugin captures the image.
 - If `lastChallenge` is set but not enabled in the effective list, it is ignored.
+- If `takePhotoOnChallenge` is set but not enabled in the effective list, the photo is taken on the final effective challenge.
 - If `shuffleListWithSmileLast` is `true`, `lastChallenge` is not set, and shuffling remains enabled, `smile` becomes the implicit last challenge for backward compatibility.
 
 ## Look Forward Challenge
@@ -180,7 +184,7 @@ You can customize challenge labels or skip certain challenges:
 
 - It checks that `abs(headEulerAngleY)` and `abs(headEulerAngleX)` are both within a forward-facing threshold.
 - The face must stay stable for 400 ms before the step completes.
-- When `lookForward` is the last effective challenge, the capture is triggered immediately after that step completes.
+- When `takePhotoOnChallenge` resolves to `lookForward`, the capture is triggered immediately after that step completes.
 
 ## Complete Example 💡
 

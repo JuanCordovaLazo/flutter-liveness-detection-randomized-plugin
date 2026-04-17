@@ -99,6 +99,24 @@ class LivenessChallengeFlowBuilder {
     return orderedSteps;
   }
 
+  static LivenessDetectionStep? resolveTakePhotoOnChallenge({
+    required LivenessDetectionConfig config,
+    required List<LivenessDetectionStepItem> steps,
+  }) {
+    if (steps.isEmpty) {
+      return null;
+    }
+
+    final LivenessDetectionStep? configuredChallenge =
+        config.takePhotoOnChallenge;
+    if (configuredChallenge != null &&
+        steps.any((item) => item.step == configuredChallenge)) {
+      return configuredChallenge;
+    }
+
+    return steps.last.step;
+  }
+
   static LivenessDetectionStep? _resolveEffectiveLastChallenge({
     required LivenessDetectionConfig config,
   }) {

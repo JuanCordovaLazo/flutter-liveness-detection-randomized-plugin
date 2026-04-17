@@ -31,6 +31,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   bool _faceDetectedState = false;
   List<LivenessDetectionStepItem> _shuffledSteps = [];
   DateTime? _lookForwardHoldStartedAt;
+  XFile? _capturedChallengeImage;
 
   // Brightness Screen
   Future<void> setApplicationBrightness(double brightness) async {
@@ -116,6 +117,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   void _preInitCallBack() {
     _isInfoStepCompleted = !widget.config.startWithInfoScreen;
+    _capturedChallengeImage = null;
 
     // Initialize and shuffle steps fresh each time
     _initializeShuffledSteps();
@@ -302,12 +304,18 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   }
 
   Future<void> _completeStep({required LivenessDetectionStep step}) async {
+    final bool shouldCaptureOnThisStep = _shouldCaptureOnThisStep(step);
     if (mounted) setState(() {});
     await _stepsKey.currentState?.nextPage();
+
+    if (shouldCaptureOnThisStep) {
+      await _takePicture(continueFlow: true);
+    }
+
     _stopProcessing();
   }
 
-  void _takePicture() async {
+  Future<void> _takePicture({bool continueFlow = false}) async {
     try {
       if (_cameraController == null || _isTakingPicture) return;
 
@@ -316,7 +324,11 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
       final XFile? clickedImage = await _cameraController?.takePicture();
       if (clickedImage == null) {
-        _startLiveFeed();
+        if (continueFlow) {
+          await _resumeImageStream();
+        } else {
+          _startLiveFeed();
+        }
         if (mounted) setState(() => _isTakingPicture = false);
         return;
       }
@@ -324,15 +336,55 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
       final XFile? finalImage = await _compressImage(clickedImage);
 
       debugPrint('Final image path: ${finalImage?.path}');
+
+      if (continueFlow) {
+        _capturedChallengeImage = finalImage;
+        await _resumeImageStream();
+        if (mounted) setState(() => _isTakingPicture = false);
+        return;
+      }
+
       _onDetectionCompleted(imgToReturn: finalImage);
     } catch (e) {
       debugPrint('Error taking picture: $e');
       if (mounted) setState(() => _isTakingPicture = false);
-      _startLiveFeed();
+      if (continueFlow) {
+        await _resumeImageStream();
+      } else {
+        _startLiveFeed();
+      }
     }
   }
 
+  Future<void> _resumeImageStream() async {
+    if (_cameraController == null) {
+      return;
+    }
+
+    if (!_cameraController!.value.isInitialized) {
+      return;
+    }
+
+    if (_cameraController!.value.isStreamingImages) {
+      return;
+    }
+
+    await _cameraController?.startImageStream(_processCameraImage);
+  }
+
+  Future<void> _handleFlowCompleted() async {
+    if (_capturedChallengeImage != null) {
+      _onDetectionCompleted(imgToReturn: _capturedChallengeImage);
+      return;
+    }
+
+    await _takePicture();
+  }
+
   void _onDetectionCompleted({XFile? imgToReturn}) async {
+    _timerToDetectFace?.cancel();
+    _timerToDetectFace = null;
+
     final String? imgPath = imgToReturn?.path;
 
     if (imgPath != null) {
@@ -359,6 +411,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   void _resetSteps() {
     List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
     _resetLookForwardHold();
+    _capturedChallengeImage = null;
 
     for (var step in currentSteps) {
       final index = currentSteps.indexWhere((p1) => p1.step == step.step);
@@ -446,20 +499,38 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
           steps: _getStepsToUse(),
           showCurrentStep: widget.config.showCurrentStep,
           completionDelay: _getCompletionDelay(),
-          onCompleted: _takePicture,
+          onCompleted: _handleFlowCompleted,
         ),
       ],
     );
   }
 
   Duration _getCompletionDelay() {
-    final List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
-    if (currentSteps.isNotEmpty &&
-        currentSteps.last.step == LivenessDetectionStep.lookForward) {
+    final LivenessDetectionStep? takePhotoOnChallenge =
+        _getEffectiveTakePhotoOnChallenge();
+    if (takePhotoOnChallenge == LivenessDetectionStep.lookForward) {
       return Duration.zero;
     }
 
     return const Duration(milliseconds: 500);
+  }
+
+  LivenessDetectionStep? _getEffectiveTakePhotoOnChallenge() {
+    return LivenessChallengeFlowBuilder.resolveTakePhotoOnChallenge(
+      config: widget.config,
+      steps: _getStepsToUse(),
+    );
+  }
+
+  bool _isLastEffectiveStep(LivenessDetectionStep step) {
+    final List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
+    return currentSteps.isNotEmpty && currentSteps.last.step == step;
+  }
+
+  bool _shouldCaptureOnThisStep(LivenessDetectionStep step) {
+    final LivenessDetectionStep? takePhotoOnChallenge =
+        _getEffectiveTakePhotoOnChallenge();
+    return takePhotoOnChallenge == step && !_isLastEffectiveStep(step);
   }
 
   void _resetLookForwardHold() {

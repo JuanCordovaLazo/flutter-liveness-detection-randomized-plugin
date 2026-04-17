@@ -26,6 +26,7 @@ void exampleUsage() {
     useCustomizedLabel: true,
     mustShuffle: true,
     lastChallenge: LivenessDetectionStep.lookForward,
+    takePhotoOnChallenge: LivenessDetectionStep.lookForward,
     customizedLabel: LivenessDetectionLabelModel(
       blink: 'Kedipkan Mata',
       lookUp: 'Lihat Atas',
@@ -73,6 +74,7 @@ void exampleUsage() {
     useCustomizedLabel: true,
     mustShuffle: false,
     lastChallenge: LivenessDetectionStep.lookForward,
+    takePhotoOnChallenge: LivenessDetectionStep.lookForward,
     customizedLabel: LivenessDetectionLabelModel(
       blink: 'Step 1',
       lookUp: 'Step 2',
@@ -83,4 +85,22 @@ void exampleUsage() {
       lookForward: 'Final Step',
     ),
   );
+
+  // ✅ CORRECT: Capture on lookForward, then continue to a final smile step
+  final config6 = LivenessDetectionConfig(
+    useCustomizedLabel: true,
+    mustShuffle: false,
+    lastChallenge: LivenessDetectionStep.smile,
+    takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+    customizedLabel: LivenessDetectionLabelModel(
+      blink: 'Step 1',
+      lookUp: 'Step 2',
+      lookDown: '',
+      lookRight: 'Step 3',
+      lookLeft: '',
+      smile: 'Step 5',
+      lookForward: 'Step 4 - Capture Here',
+    ),
+  );
+  // Result: The photo is taken on lookForward, then the user still completes smile as the last challenge
 }

@@ -170,5 +170,56 @@ void main() {
       );
       expect(ordered.last.step, LivenessDetectionStep.lookForward);
     });
+
+    test('uses the configured photo challenge when it exists', () {
+      final config = LivenessDetectionConfig(
+        useCustomizedLabel: true,
+        mustShuffle: false,
+        takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+        customizedLabel: LivenessDetectionLabelModel(
+          blink: 'Blink',
+          lookUp: 'Look Up',
+          lookRight: 'Look Right',
+          smile: 'Smile',
+          lookForward: 'Look Forward',
+        ),
+      );
+
+      final steps = LivenessChallengeFlowBuilder.buildSteps(config: config);
+      final takePhotoOnChallenge =
+          LivenessChallengeFlowBuilder.resolveTakePhotoOnChallenge(
+            config: config,
+            steps: steps,
+          );
+
+      expect(takePhotoOnChallenge, LivenessDetectionStep.lookForward);
+    });
+
+    test(
+      'falls back to the last effective challenge when photo challenge is absent',
+      () {
+        final config = LivenessDetectionConfig(
+          useCustomizedLabel: true,
+          mustShuffle: false,
+          takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Blink',
+            lookUp: 'Look Up',
+            lookRight: 'Look Right',
+            smile: 'Smile',
+            lookForward: '',
+          ),
+        );
+
+        final steps = LivenessChallengeFlowBuilder.buildSteps(config: config);
+        final takePhotoOnChallenge =
+            LivenessChallengeFlowBuilder.resolveTakePhotoOnChallenge(
+              config: config,
+              steps: steps,
+            );
+
+        expect(takePhotoOnChallenge, LivenessDetectionStep.smile);
+      },
+    );
   });
 }

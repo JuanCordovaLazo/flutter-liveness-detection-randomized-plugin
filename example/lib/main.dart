@@ -17,7 +17,7 @@ class _HomeViewState extends State<HomeView> {
   List<String?> capturedImages = [];
   String? imgPath;
   int livenessScenario = 0;
-  final int totalScenarios = 12;
+  final int totalScenarios = 13;
 
   @override
   void initState() {
@@ -118,6 +118,8 @@ class _HomeViewState extends State<HomeView> {
         return 'Custom shuffle: lookForward forced last for frontal capture';
       case 11:
         return 'Legacy compatibility: shuffleListWithSmileLast still works';
+      case 12:
+        return 'Photo on lookForward, then finish with smile as the last challenge';
       default:
         return '';
     }
@@ -137,6 +139,7 @@ class _HomeViewState extends State<HomeView> {
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
           lastChallenge: LivenessDetectionStep.smile,
+          takePhotoOnChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
         );
@@ -331,6 +334,7 @@ class _HomeViewState extends State<HomeView> {
           useCustomizedLabel: true,
           mustShuffle: true,
           lastChallenge: LivenessDetectionStep.lookForward,
+          takePhotoOnChallenge: LivenessDetectionStep.lookForward,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
           isDarkMode: false,
@@ -358,8 +362,34 @@ class _HomeViewState extends State<HomeView> {
           isEnableSnackBar: true,
           // ignore: deprecated_member_use
           shuffleListWithSmileLast: true,
+          takePhotoOnChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
+        );
+      case 12: // Capture before the last challenge
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.medium,
+          imageQuality: 90,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: true,
+          mustShuffle: false,
+          lastChallenge: LivenessDetectionStep.smile,
+          takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          isDarkMode: false,
+          showCurrentStep: true,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Step 1: Blink',
+            lookUp: 'Step 2: Look Up',
+            lookDown: '',
+            lookRight: 'Step 3: Turn Right',
+            lookLeft: '',
+            smile: 'Step 5: Final Smile',
+            lookForward: 'Step 4: Face Forward And Capture',
+          ),
         );
       default:
         return LivenessDetectionConfig();

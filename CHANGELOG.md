@@ -5,11 +5,12 @@
 - Added `lookForward` as an optional challenge for final frontal face alignment before capture
 - Added `lastChallenge` to pin any enabled challenge to the final position
 - Added `mustShuffle` to control whether the effective challenge list is shuffled or preserved as declared
+- Added `takePhotoOnChallenge` to decide which effective challenge triggers the photo capture
 
 ## Improvements
 
 - Centralized effective challenge list building for default and customized flows
-- Final capture now happens immediately after `lookForward` completes when it is the last effective challenge
+- Final capture can now be decoupled from the final challenge through `takePhotoOnChallenge`
 
 ## Compatibility
 

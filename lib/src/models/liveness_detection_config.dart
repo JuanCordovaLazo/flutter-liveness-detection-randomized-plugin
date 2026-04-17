@@ -18,6 +18,7 @@ class LivenessDetectionConfig {
   @Deprecated('Use mustShuffle and lastChallenge instead.')
   final bool shuffleListWithSmileLast;
   final LivenessDetectionStep? lastChallenge;
+  final LivenessDetectionStep? takePhotoOnChallenge;
   final bool? mustShuffle;
   final bool showCurrentStep;
   final bool isDarkMode;
@@ -38,6 +39,7 @@ class LivenessDetectionConfig {
     @Deprecated('Use mustShuffle and lastChallenge instead.')
     this.shuffleListWithSmileLast = true,
     this.lastChallenge,
+    this.takePhotoOnChallenge,
     this.mustShuffle,
     this.showCurrentStep = false,
     this.isDarkMode = true,
