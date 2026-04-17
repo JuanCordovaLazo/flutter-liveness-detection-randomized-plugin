@@ -94,7 +94,6 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     mustShuffle: true, // Shuffle enabled challenges
     lastChallenge: LivenessDetectionStep.lookForward, // Optional fixed last challenge
     takePhotoOnChallenge: LivenessDetectionStep.lookForward, // Optional challenge that triggers the photo capture
-    shuffleListWithSmileLast: true, // Deprecated legacy alias for smile last
 
     // Customization
     useCustomizedLabel: false, // Enable custom labels
@@ -141,7 +140,7 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
 - `mustShuffle`: Shuffle the effective challenge list (default: true)
 - `lastChallenge`: Optional fixed last challenge from `LivenessDetectionStep`
 - `takePhotoOnChallenge`: Optional challenge that triggers the photo capture; if absent from the effective list, the plugin falls back to the final effective challenge
-- `shuffleListWithSmileLast`: Deprecated legacy alias for `lastChallenge: LivenessDetectionStep.smile`
+- `shuffleListWithSmileLast`: Deprecated and ignored; use `lastChallenge` instead
 
 ### Customization
 
@@ -182,7 +181,6 @@ You can customize challenge labels or skip certain challenges:
 - Use `takePhotoOnChallenge` to decide on which effective challenge the plugin captures the image.
 - If `lastChallenge` is set but not enabled in the effective list, it is ignored.
 - If `takePhotoOnChallenge` is set but not enabled in the effective list, the photo is taken on the final effective challenge.
-- If `shuffleListWithSmileLast` is `true`, `lastChallenge` is not set, and shuffling remains enabled, `smile` becomes the implicit last challenge for backward compatibility.
 
 ## Look Forward Challenge
 
@@ -261,7 +259,6 @@ The example app includes 12 liveness scenarios to test all features:
 
 ```dart
 LivenessDetectionConfig(
-  shuffleListWithSmileLast: true,
   startWithInfoScreen: true,
   // Standard settings
 )
@@ -271,7 +268,7 @@ LivenessDetectionConfig(
 
 ```dart
 LivenessDetectionConfig(
-  shuffleListWithSmileLast: false,
+  mustShuffle: true,
   durationLivenessVerify: 30,
   startWithInfoScreen: false,
 )
@@ -406,13 +403,22 @@ LivenessDetectionConfig(
 )
 ```
 
-### Scenario 12: Legacy Compatibility
+### Scenario 12: Shuffle Without Fixed Last Challenge
 
 ```dart
 LivenessDetectionConfig(
-  useCustomizedLabel: false,
+  useCustomizedLabel: true,
   mustShuffle: true,
-  shuffleListWithSmileLast: true,
+  takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+  customizedLabel: LivenessDetectionLabelModel(
+    blink: 'Blink',
+    lookUp: 'Look Up',
+    lookDown: '',
+    lookRight: 'Look Right',
+    lookLeft: 'Look Left',
+    smile: 'Smile',
+    lookForward: 'Face Forward',
+  ),
 )
 ```
 
@@ -429,7 +435,6 @@ await plugin.livenessDetection(
   context: context,
   config: LivenessDetectionConfig(...),
   isEnableSnackBar: true,
-  shuffleListWithSmileLast: true,
   showCurrentStep: true,
   isDarkMode: false,
 );
@@ -451,4 +456,4 @@ await plugin.livenessDetection(
 );
 ```
 
-For backward compatibility, existing integrations that still set `shuffleListWithSmileLast: true` continue to work and keep `smile` as the implicit last challenge when `lastChallenge` is not provided.
+If older integrations still pass `shuffleListWithSmileLast`, the property is ignored. Migrate to `lastChallenge` whenever you need a fixed final challenge.

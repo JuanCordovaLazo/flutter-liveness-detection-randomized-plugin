@@ -124,7 +124,7 @@ void main() {
     );
 
     test(
-      'maintains legacy smile-last behavior when lastChallenge is not set',
+      'does not force smile last when deprecated shuffleListWithSmileLast is set',
       () {
         final config = LivenessDetectionConfig(
           useCustomizedLabel: false,
@@ -138,7 +138,7 @@ void main() {
           random: Random(3),
         );
 
-        expect(steps.last.step, LivenessDetectionStep.smile);
+        expect(steps.last.step, isNot(LivenessDetectionStep.smile));
       },
     );
 

@@ -15,7 +15,7 @@ class LivenessDetectionConfig {
   final int maxFailedAttempts;
   final int cooldownMinutes;
   final bool isEnableSnackBar;
-  @Deprecated('Use mustShuffle and lastChallenge instead.')
+  @Deprecated('Ignored. Use mustShuffle and lastChallenge instead.')
   final bool shuffleListWithSmileLast;
   final LivenessDetectionStep? lastChallenge;
   final LivenessDetectionStep? takePhotoOnChallenge;
@@ -39,8 +39,8 @@ class LivenessDetectionConfig {
     this.maxFailedAttempts = 3,
     this.cooldownMinutes = 10,
     this.isEnableSnackBar = true,
-    @Deprecated('Use mustShuffle and lastChallenge instead.')
-    this.shuffleListWithSmileLast = true,
+    @Deprecated('Ignored. Use mustShuffle and lastChallenge instead.')
+    this.shuffleListWithSmileLast = false,
     this.lastChallenge,
     this.takePhotoOnChallenge,
     this.mustShuffle,

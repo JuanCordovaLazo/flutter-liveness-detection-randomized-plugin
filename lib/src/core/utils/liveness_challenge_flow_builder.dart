@@ -120,17 +120,7 @@ class LivenessChallengeFlowBuilder {
   static LivenessDetectionStep? _resolveEffectiveLastChallenge({
     required LivenessDetectionConfig config,
   }) {
-    if (config.lastChallenge != null) {
-      return config.lastChallenge;
-    }
-
-    final bool shouldShuffle = config.mustShuffle ?? true;
-    // ignore: deprecated_member_use_from_same_package
-    if (shouldShuffle && config.shuffleListWithSmileLast) {
-      return LivenessDetectionStep.smile;
-    }
-
-    return null;
+    return config.lastChallenge;
   }
 
   static List<LivenessDetectionStepItem> _cloneSteps(

@@ -117,7 +117,7 @@ class _HomeViewState extends State<HomeView> {
       case 10:
         return 'Custom shuffle: lookForward forced last for frontal capture';
       case 11:
-        return 'Legacy compatibility: shuffleListWithSmileLast still works';
+        return 'Custom shuffle: no implicit last challenge';
       case 12:
         return 'Photo on lookForward, then finish with smile as the last challenge';
       default:
@@ -355,22 +355,29 @@ class _HomeViewState extends State<HomeView> {
             lookForward: 'Face Forward For Capture',
           ),
         );
-      case 11: // Legacy compatibility
+      case 11: // Shuffle without fixed last challenge
         return LivenessDetectionConfig(
           cameraResolution: ResolutionPreset.medium,
           imageQuality: 90,
           isEnableMaxBrightness: true,
           durationLivenessVerify: 45,
           startWithInfoScreen: true,
-          useCustomizedLabel: false,
+          useCustomizedLabel: true,
           mustShuffle: true,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          // ignore: deprecated_member_use
-          shuffleListWithSmileLast: true,
-          takePhotoOnChallenge: LivenessDetectionStep.smile,
+          takePhotoOnChallenge: LivenessDetectionStep.lookForward,
           isDarkMode: false,
           showCurrentStep: true,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Blink',
+            lookUp: 'Look Up',
+            lookDown: '',
+            lookRight: 'Look Right',
+            lookLeft: 'Look Left',
+            smile: 'Smile',
+            lookForward: 'Face Forward',
+          ),
         );
       case 12: // Capture before the last challenge
         return LivenessDetectionConfig(

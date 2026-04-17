@@ -14,7 +14,7 @@
 
 ## Compatibility
 
-- `shuffleListWithSmileLast` remains supported as a deprecated legacy alias for `lastChallenge: LivenessDetectionStep.smile`
+- `shuffleListWithSmileLast` is now ignored; use `lastChallenge` to pin the final challenge explicitly
 
 ---
 

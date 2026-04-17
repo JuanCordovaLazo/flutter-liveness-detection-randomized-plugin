@@ -71,8 +71,7 @@ void exampleUsage() {
   // ✅ CORRECT: Use default behavior
   final config4 = LivenessDetectionConfig(
     useCustomizedLabel: false, // customizedLabel will be ignored
-    // ignore: deprecated_member_use_from_same_package
-    shuffleListWithSmileLast: true, // Legacy compatibility: smile stays last
+    mustShuffle: true,
   );
 
   // ✅ CORRECT: New flow control with explicit ordering and no shuffle
