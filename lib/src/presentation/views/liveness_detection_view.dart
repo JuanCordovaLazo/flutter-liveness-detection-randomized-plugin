@@ -11,10 +11,7 @@ List<CameraDescription> availableCams = [];
 class LivenessDetectionView extends StatefulWidget {
   final LivenessDetectionConfig config;
 
-  const LivenessDetectionView({
-    super.key,
-    required this.config,
-  });
+  const LivenessDetectionView({super.key, required this.config});
 
   @override
   State<LivenessDetectionView> createState() => _LivenessDetectionScreenState();
@@ -33,6 +30,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   bool _isProcessingStep = false;
   bool _faceDetectedState = false;
   List<LivenessDetectionStepItem> _shuffledSteps = [];
+  DateTime? _lookForwardHoldStartedAt;
 
   // Brightness Screen
   Future<void> setApplicationBrightness(double brightness) async {
@@ -57,27 +55,6 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   late final List<LivenessDetectionStepItem> steps;
   final GlobalKey<LivenessDetectionStepOverlayWidgetState> _stepsKey =
       GlobalKey<LivenessDetectionStepOverlayWidgetState>();
-
-  static void shuffleListLivenessChallenge({
-    required List<LivenessDetectionStepItem> list,
-    required bool isSmileLast,
-  }) {
-    if (isSmileLast) {
-      int? smileIndex = list.indexWhere(
-        (item) => item.step == LivenessDetectionStep.smile,
-      );
-
-      if (smileIndex != -1) {
-        LivenessDetectionStepItem smileItem = list.removeAt(smileIndex);
-        list.shuffle(Random());
-        list.add(smileItem);
-      } else {
-        list.shuffle(Random());
-      }
-    } else {
-      list.shuffle(Random());
-    }
-  }
 
   Future<XFile?> _compressImage(XFile originalFile) async {
     final int quality = widget.config.imageQuality;
@@ -111,87 +88,6 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     }
   }
 
-  List<T> manualRandomItemLiveness<T>(List<T> list) {
-    final random = Random();
-    List<T> shuffledList = List.from(list);
-    for (int i = shuffledList.length - 1; i > 0; i--) {
-      int j = random.nextInt(i + 1);
-
-      T temp = shuffledList[i];
-      shuffledList[i] = shuffledList[j];
-      shuffledList[j] = temp;
-    }
-    return shuffledList;
-  }
-
-  List<LivenessDetectionStepItem> customizedLivenessLabel(
-    LivenessDetectionLabelModel label,
-  ) {
-    List<LivenessDetectionStepItem> customizedSteps = [];
-
-    // Add blink step if not explicitly skipped (empty string skips)
-    if (label.blink != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.blink,
-          title: label.blink ?? "Blink 2-3 Times",
-        ),
-      );
-    }
-
-    // Add lookRight step if not explicitly skipped
-    if (label.lookRight != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookRight,
-          title: label.lookRight ?? "Look RIGHT",
-        ),
-      );
-    }
-
-    // Add lookLeft step if not explicitly skipped
-    if (label.lookLeft != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookLeft,
-          title: label.lookLeft ?? "Look LEFT",
-        ),
-      );
-    }
-
-    // Add lookUp step if not explicitly skipped
-    if (label.lookUp != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookUp,
-          title: label.lookUp ?? "Look UP",
-        ),
-      );
-    }
-
-    // Add lookDown step if not explicitly skipped
-    if (label.lookDown != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.lookDown,
-          title: label.lookDown ?? "Look DOWN",
-        ),
-      );
-    }
-
-    // Add smile step if not explicitly skipped
-    if (label.smile != "") {
-      customizedSteps.add(
-        LivenessDetectionStepItem(
-          step: LivenessDetectionStep.smile,
-          title: label.smile ?? "Smile",
-        ),
-      );
-    }
-
-    return customizedSteps;
-  }
-
   @override
   void initState() {
     _preInitCallBack();
@@ -211,7 +107,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     _timerToDetectFace?.cancel();
     _timerToDetectFace = null;
     _cameraController?.dispose();
-    
+
     if (widget.config.isEnableMaxBrightness) {
       resetApplicationBrightness();
     }
@@ -220,10 +116,10 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   void _preInitCallBack() {
     _isInfoStepCompleted = !widget.config.startWithInfoScreen;
-    
+
     // Initialize and shuffle steps fresh each time
     _initializeShuffledSteps();
-    
+
     if (widget.config.isEnableMaxBrightness) {
       setApplicationBrightness(1.0);
     }
@@ -340,6 +236,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {
       if (faces.isEmpty) {
+        _resetLookForwardHold();
         _resetSteps();
         if (mounted) setState(() => _faceDetectedState = false);
       } else {
@@ -347,13 +244,11 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         final currentIndex = _stepsKey.currentState?.currentIndex ?? 0;
         List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
         if (currentIndex < currentSteps.length) {
-          _detectFace(
-            face: faces.first,
-            step: currentSteps[currentIndex].step,
-          );
+          _detectFace(face: faces.first, step: currentSteps[currentIndex].step);
         }
       }
     } else {
+      _resetLookForwardHold();
       _resetSteps();
     }
 
@@ -371,27 +266,37 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
     switch (step) {
       case LivenessDetectionStep.blink:
+        _resetLookForwardHold();
         await _handlingBlinkStep(face: face, step: step);
         break;
 
       case LivenessDetectionStep.lookRight:
+        _resetLookForwardHold();
         await _handlingTurnRight(face: face, step: step);
         break;
 
       case LivenessDetectionStep.lookLeft:
+        _resetLookForwardHold();
         await _handlingTurnLeft(face: face, step: step);
         break;
 
       case LivenessDetectionStep.lookUp:
+        _resetLookForwardHold();
         await _handlingLookUp(face: face, step: step);
         break;
 
       case LivenessDetectionStep.lookDown:
+        _resetLookForwardHold();
         await _handlingLookDown(face: face, step: step);
         break;
 
       case LivenessDetectionStep.smile:
+        _resetLookForwardHold();
         await _handlingSmile(face: face, step: step);
+        break;
+
+      case LivenessDetectionStep.lookForward:
+        await _handlingLookForward(face: face, step: step);
         break;
     }
   }
@@ -453,18 +358,19 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   void _resetSteps() {
     List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
-    
+    _resetLookForwardHold();
+
     for (var step in currentSteps) {
       final index = currentSteps.indexWhere((p1) => p1.step == step.step);
       if (index != -1) {
         currentSteps[index] = currentSteps[index].copyWith();
       }
     }
-    
+
     if (_stepsKey.currentState?.currentIndex != 0) {
       _stepsKey.currentState?.reset();
     }
-    
+
     if (mounted) setState(() {});
   }
 
@@ -480,22 +386,10 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   /// Initialize and shuffle steps fresh each time
   void _initializeShuffledSteps() {
-    List<LivenessDetectionStepItem> baseSteps;
-    
-    if (widget.config.useCustomizedLabel && widget.config.customizedLabel != null) {
-      baseSteps = customizedLivenessLabel(widget.config.customizedLabel!);
-    } else {
-      baseSteps = List.from(stepLiveness); // Create a copy to avoid modifying the original
-    }
-    
-    shuffleListLivenessChallenge(
-      list: baseSteps,
-      isSmileLast: widget.config.useCustomizedLabel
-          ? false
-          : widget.config.shuffleListWithSmileLast,
+    _shuffledSteps = LivenessChallengeFlowBuilder.buildSteps(
+      config: widget.config,
+      defaultSteps: stepLiveness,
     );
-    
-    _shuffledSteps = baseSteps;
   }
 
   /// Helper method to get the shuffled steps list
@@ -551,13 +445,35 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
           key: _stepsKey,
           steps: _getStepsToUse(),
           showCurrentStep: widget.config.showCurrentStep,
-          onCompleted: () => Future.delayed(
-            const Duration(milliseconds: 500),
-            () => _takePicture(),
-          ),
+          completionDelay: _getCompletionDelay(),
+          onCompleted: _takePicture,
         ),
       ],
     );
+  }
+
+  Duration _getCompletionDelay() {
+    final List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
+    if (currentSteps.isNotEmpty &&
+        currentSteps.last.step == LivenessDetectionStep.lookForward) {
+      return Duration.zero;
+    }
+
+    return const Duration(milliseconds: 500);
+  }
+
+  void _resetLookForwardHold() {
+    _lookForwardHoldStartedAt = null;
+  }
+
+  double _getLookForwardAlignmentThreshold() {
+    final headTurnThreshold =
+        FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
+                .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+            as LivenessThresholdHead?;
+    final double rotationAngle = headTurnThreshold?.rotationAngle ?? 45.0;
+
+    return min(15.0, max(8.0, rotationAngle / 3));
   }
 
   Future<void> _handlingBlinkStep({
@@ -676,5 +592,38 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
       _startProcessing();
       await _completeStep(step: step);
     }
+  }
+
+  Future<void> _handlingLookForward({
+    required Face face,
+    required LivenessDetectionStep step,
+  }) async {
+    final DateTime now = DateTime.now();
+    final double alignmentThreshold = _getLookForwardAlignmentThreshold();
+    final bool isFacingForward =
+        LivenessFaceOrientationHelper.isFaceAlignedForStep(
+          step: step,
+          face: face,
+          maxPitch: alignmentThreshold,
+          maxYaw: alignmentThreshold,
+        );
+
+    if (!isFacingForward) {
+      _resetLookForwardHold();
+      return;
+    }
+
+    _lookForwardHoldStartedAt ??= now;
+
+    if (!LivenessFaceOrientationHelper.hasSatisfiedLookForwardHold(
+      startedAt: _lookForwardHoldStartedAt!,
+      now: now,
+    )) {
+      return;
+    }
+
+    _resetLookForwardHold();
+    _startProcessing();
+    await _completeStep(step: step);
   }
 }

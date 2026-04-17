@@ -8,41 +8,49 @@ void exampleUsage() {
   // ✅ CORRECT: Skip blink and lookDown, use custom labels for others
   final config1 = LivenessDetectionConfig(
     useCustomizedLabel: true,
+    mustShuffle: false,
     customizedLabel: LivenessDetectionLabelModel(
       blink: '', // Empty string = skip this challenge
       lookUp: 'Tengok Atas', // Custom label
       lookDown: '', // Empty string = skip this challenge
-      lookLeft: null, // null = use default label "Look LEFT"
       lookRight: null, // null = use default label "Look RIGHT"
+      lookLeft: null, // null = use default label "Look LEFT"
       smile: 'Senyum Dong!', // Custom label
+      lookForward: 'Hadap Depan', // Final alignment before capture
     ),
   );
-  // Result: Only lookUp, lookLeft, lookRight, smile challenges will appear
+  // Result: Only lookUp, lookRight, lookLeft, smile, lookForward challenges appear in declared order
 
   // ✅ CORRECT: Use all challenges with custom labels
   final config2 = LivenessDetectionConfig(
     useCustomizedLabel: true,
+    mustShuffle: true,
+    lastChallenge: LivenessDetectionStep.lookForward,
     customizedLabel: LivenessDetectionLabelModel(
       blink: 'Kedipkan Mata',
       lookUp: 'Lihat Atas',
       lookDown: 'Lihat Bawah',
-      lookLeft: 'Lihat Kiri',
       lookRight: 'Lihat Kanan',
+      lookLeft: 'Lihat Kiri',
       smile: 'Tersenyum',
+      lookForward: 'Lurus ke Kamera',
     ),
   );
-  // Result: All 6 challenges with Indonesian labels
+  // Result: The flow is shuffled, but lookForward always stays as the final step
 
   // ✅ CORRECT: Mix of custom, default, and skipped
   final config3 = LivenessDetectionConfig(
     useCustomizedLabel: true,
+    mustShuffle: true,
+    lastChallenge: LivenessDetectionStep.smile,
     customizedLabel: LivenessDetectionLabelModel(
       blink: null, // Use default "Blink 2-3 Times"
       lookUp: '', // Skip
       lookDown: '', // Skip
-      lookLeft: 'Turn Left Please',
       lookRight: 'Turn Right Please',
+      lookLeft: 'Turn Left Please',
       smile: null, // Use default "Smile"
+      lookForward: '', // Skip
     ),
   );
   // Result: Only blink, lookLeft, lookRight, smile challenges
@@ -56,6 +64,23 @@ void exampleUsage() {
   // ✅ CORRECT: Use default behavior
   final config4 = LivenessDetectionConfig(
     useCustomizedLabel: false, // customizedLabel will be ignored
-    shuffleListWithSmileLast: true, // This works with default steps
+    // ignore: deprecated_member_use_from_same_package
+    shuffleListWithSmileLast: true, // Legacy compatibility: smile stays last
+  );
+
+  // ✅ CORRECT: New flow control with explicit ordering and no shuffle
+  final config5 = LivenessDetectionConfig(
+    useCustomizedLabel: true,
+    mustShuffle: false,
+    lastChallenge: LivenessDetectionStep.lookForward,
+    customizedLabel: LivenessDetectionLabelModel(
+      blink: 'Step 1',
+      lookUp: 'Step 2',
+      lookDown: '',
+      lookRight: 'Step 3',
+      lookLeft: '',
+      smile: 'Step 4',
+      lookForward: 'Final Step',
+    ),
   );
 }

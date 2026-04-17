@@ -13,11 +13,13 @@ Crafted with love by **[Bagus Subagja](https://www.linkedin.com/in/bagussubagja/
 Feel free to fork and modify this package to suit your needs - that's much more enjoyable and respectful 😊
 
 ## Preview 🪟
+
 ![Slide 16_9 - 1](https://github.com/user-attachments/assets/55e59d51-e0da-4562-879e-ae50adaced33)
 
 https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 
 ## Update 1.2.1
+
 - ⬆️ **Kotlin updated to 2.1.0** for better performance and support 16KB google page size policy
 - ⬆️ compileSdk & targetSdk bumped to **36** (Android 16)
 - ☕ Java & Kotlin JVM target upgraded to **VERSION_17**
@@ -27,6 +29,7 @@ https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 - 🐦 Flutter minimum version bumped to **3.38.7**
 
 ## Update 1.1.0
+
 - ⏱️ Added automatic cooldown feature after 3 failed verification attempts
 - 🔒 10-minute waiting period with persistent countdown (survives app restarts)
 - 🎯 Countdown only decreases when app is active (pauses when app is backgrounded)
@@ -36,6 +39,7 @@ https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 - ✅ Added validation: `customizedLabel` must not be null when `useCustomizedLabel` is true
 
 ## Update 1.0.6
+
 ![Slide 16_9 - 9](https://github.com/user-attachments/assets/3a9b187a-ccfd-4542-a8d9-88b7ef7903a9)
 Face stretching already fixed on this version
 
@@ -43,7 +47,9 @@ Face stretching already fixed on this version
 
 - 📱 Real-time face detection
 - 🎲 Randomized challenge sequence generation
-- 💫 Cross-platform support (iOS & Android) 
+- 🧭 Optional fixed last challenge with `lastChallenge`
+- 📷 `lookForward` final alignment step for frontal capture
+- 💫 Cross-platform support (iOS & Android)
 - 🎨 Light and dark mode support
 - ✅ High accuracy liveness verification
 - 🚀 Simple integration API
@@ -72,29 +78,32 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     cameraResolution: ResolutionPreset.medium, // Camera resolution
     imageQuality: 100, // Image quality (0-100)
     isEnableMaxBrightness: true, // Auto brightness adjustment
-    
+
     // Detection Settings
     durationLivenessVerify: 60, // Detection timeout in seconds
     showDurationUiText: false, // Show countdown timer
     startWithInfoScreen: true, // Show tutorial screen
-    
+
     // UI Settings
     isDarkMode: false, // Dark/light theme
     showCurrentStep: true, // Show step counter
     isEnableSnackBar: true, // Show result notifications
-    shuffleListWithSmileLast: true, // Randomize challenges with smile last
-    
+    mustShuffle: true, // Shuffle enabled challenges
+    lastChallenge: LivenessDetectionStep.lookForward, // Optional fixed last challenge
+    shuffleListWithSmileLast: true, // Deprecated legacy alias for smile last
+
     // Customization
     useCustomizedLabel: false, // Enable custom labels
     customizedLabel: LivenessDetectionLabelModel(
       blink: '', // Empty string = skip challenge
       lookDown: '', // Skip this challenge
-      lookLeft: null, // null = use default "Look LEFT"
       lookRight: 'Turn Right', // Custom label
+      lookLeft: null, // null = use default "Look LEFT"
       lookUp: 'Look Up Please', // Custom label
       smile: null, // null = use default "Smile"
+      lookForward: 'Face Forward', // Optional final frontal alignment
     ),
-    
+
     // Security Features
     enableCooldownOnFailure: true, // Enable cooldown after failures
     maxFailedAttempts: 3, // Failed attempts before cooldown
@@ -106,32 +115,41 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
 ## Configuration Parameters 📋
 
 ### Camera & Image Settings
+
 - `cameraResolution`: Camera quality (ResolutionPreset.low/medium/high)
 - `imageQuality`: Output image quality 0-100 (default: 100)
 - `isEnableMaxBrightness`: Auto brightness adjustment (default: true)
 
-### Detection Settings  
+### Detection Settings
+
 - `durationLivenessVerify`: Detection timeout in seconds (default: 45)
 - `showDurationUiText`: Show countdown timer (default: false)
 - `startWithInfoScreen`: Show tutorial before detection (default: false)
 
 ### UI Settings
+
 - `isDarkMode`: Dark theme mode (default: true)
 - `showCurrentStep`: Show current step number (default: false)
 - `isEnableSnackBar`: Show success/failure notifications (default: true)
-- `shuffleListWithSmileLast`: Randomize challenges with smile at end (default: true)
+- `mustShuffle`: Shuffle the effective challenge list (default: true)
+- `lastChallenge`: Optional fixed last challenge from `LivenessDetectionStep`
+- `shuffleListWithSmileLast`: Deprecated legacy alias for `lastChallenge: LivenessDetectionStep.smile`
 
 ### Customization
+
 - `useCustomizedLabel`: Enable custom challenge labels (default: false)
-- `customizedLabel`: Custom labels for each challenge type
+- `customizedLabel`: Custom labels for each challenge type, including `lookForward`
 
 ### Security Features
+
 - `enableCooldownOnFailure`: Enable cooldown after failed attempts (default: true)
 - `maxFailedAttempts`: Number of failures before cooldown (default: 3)
 - `cooldownMinutes`: Cooldown duration in minutes (default: 10)
 
 ## Cooldown Feature
+
 The plugin includes an automatic cooldown mechanism to prevent brute force attempts:
+
 - Configurable number of failed attempts before cooldown
 - Configurable cooldown duration
 - Countdown timer only decreases when app is active
@@ -139,11 +157,30 @@ The plugin includes an automatic cooldown mechanism to prevent brute force attem
 - Users see a countdown screen during cooldown period
 
 ## Customized Steps Label
+
 You can customize challenge labels or skip certain challenges:
+
 - Use empty string `''` to skip a challenge
 - Use `null` to keep default label
 - Provide custom string for personalized labels
 - When `useCustomizedLabel: true`, `customizedLabel` must not be null
+- When `mustShuffle: false`, the effective custom order follows the declared label sequence: `blink`, `lookUp`, `lookDown`, `lookRight`, `lookLeft`, `smile`, `lookForward`
+
+## Challenge Flow Control
+
+- Use `mustShuffle: false` to preserve the effective order exactly as declared by the configured challenge list.
+- Use `mustShuffle: true` to shuffle all enabled challenges.
+- Use `lastChallenge` to pin a single enabled challenge to the final position without duplication.
+- If `lastChallenge` is set but not enabled in the effective list, it is ignored.
+- If `shuffleListWithSmileLast` is `true`, `lastChallenge` is not set, and shuffling remains enabled, `smile` becomes the implicit last challenge for backward compatibility.
+
+## Look Forward Challenge
+
+`lookForward` is intended to be the final alignment step before the capture.
+
+- It checks that `abs(headEulerAngleY)` and `abs(headEulerAngleX)` are both within a forward-facing threshold.
+- The face must stay stable for 400 ms before the step completes.
+- When `lookForward` is the last effective challenge, the capture is triggered immediately after that step completes.
 
 ## Complete Example 💡
 
@@ -167,7 +204,7 @@ class MyApp extends StatelessWidget {
                   isEnableSnackBar: true,
                 ),
               );
-              
+
               if (result != null) {
                 // Liveness detection successful
                 print('Face captured: $result');
@@ -188,14 +225,19 @@ class MyApp extends StatelessWidget {
 ## Platform Setup
 
 ### Android
+
 Add camera permission to your `android/app/src/main/AndroidManifest.xml`:
+
 ```xml
 <uses-permission android:name="android.permission.CAMERA"/>
 ```
+
 Minimum SDK version: 24
 
 ### iOS
+
 Add camera usage description to `ios/Runner/Info.plist`:
+
 ```xml
 <key>NSCameraUsageDescription</key>
 <string>Camera access is required for liveness detection</string>
@@ -203,9 +245,10 @@ Add camera usage description to `ios/Runner/Info.plist`:
 
 ## Testing Scenarios 🧪
 
-The example app includes 8 comprehensive liveness scenarios to test all features:
+The example app includes 12 liveness scenarios to test all features:
 
 ### Scenario 1: Default Configuration
+
 ```dart
 LivenessDetectionConfig(
   shuffleListWithSmileLast: true,
@@ -215,6 +258,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 2: Random Shuffle
+
 ```dart
 LivenessDetectionConfig(
   shuffleListWithSmileLast: false,
@@ -224,6 +268,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 3: Dark Mode + High Resolution
+
 ```dart
 LivenessDetectionConfig(
   isDarkMode: true,
@@ -233,6 +278,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 4: Custom Indonesian Labels
+
 ```dart
 LivenessDetectionConfig(
   useCustomizedLabel: true,
@@ -245,13 +291,14 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 5: Skip Steps (Minimal Challenges)
+
 ```dart
 LivenessDetectionConfig(
   useCustomizedLabel: true,
   customizedLabel: LivenessDetectionLabelModel(
     blink: 'Blink Eyes',
     lookDown: '', // Skip
-    lookLeft: '', // Skip  
+    lookLeft: '', // Skip
     lookRight: '', // Skip
     lookUp: 'Look Up Please',
     smile: 'Smile Wide',
@@ -260,6 +307,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 6: Timer + Cooldown Features
+
 ```dart
 LivenessDetectionConfig(
   showDurationUiText: true,
@@ -270,6 +318,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 7: Minimal Features
+
 ```dart
 LivenessDetectionConfig(
   isEnableMaxBrightness: false,
@@ -279,6 +328,7 @@ LivenessDetectionConfig(
 ```
 
 ### Scenario 8: All Features Enabled
+
 ```dart
 LivenessDetectionConfig(
   isDarkMode: true,
@@ -293,12 +343,77 @@ LivenessDetectionConfig(
 )
 ```
 
+### Scenario 9: Explicit Custom Order Without Shuffle
+
+```dart
+LivenessDetectionConfig(
+  useCustomizedLabel: true,
+  mustShuffle: false,
+  customizedLabel: LivenessDetectionLabelModel(
+    blink: 'Step 1: Blink',
+    lookUp: 'Step 2: Look Up',
+    lookRight: 'Step 3: Turn Right',
+    smile: 'Step 4: Smile',
+    lookForward: 'Step 5: Face Forward',
+  ),
+)
+```
+
+### Scenario 10: Shuffle With Smile Last
+
+```dart
+LivenessDetectionConfig(
+  useCustomizedLabel: true,
+  mustShuffle: true,
+  lastChallenge: LivenessDetectionStep.smile,
+  customizedLabel: LivenessDetectionLabelModel(
+    blink: 'Blink',
+    lookUp: 'Look Up',
+    lookDown: 'Look Down',
+    lookRight: 'Look Right',
+    lookLeft: 'Look Left',
+    smile: 'Smile Last',
+  ),
+)
+```
+
+### Scenario 11: Shuffle With `lookForward` Last
+
+```dart
+LivenessDetectionConfig(
+  useCustomizedLabel: true,
+  mustShuffle: true,
+  lastChallenge: LivenessDetectionStep.lookForward,
+  customizedLabel: LivenessDetectionLabelModel(
+    blink: 'Blink',
+    lookUp: 'Look Up',
+    lookDown: 'Look Down',
+    lookRight: 'Look Right',
+    lookLeft: 'Look Left',
+    smile: 'Smile',
+    lookForward: 'Face Forward For Capture',
+  ),
+)
+```
+
+### Scenario 12: Legacy Compatibility
+
+```dart
+LivenessDetectionConfig(
+  useCustomizedLabel: false,
+  mustShuffle: true,
+  shuffleListWithSmileLast: true,
+)
+```
+
 ## Migration Guide 🔄
 
 ### From v1.0.x to v1.1.0+
+
 All parameters are now consolidated into the `LivenessDetectionConfig` object:
 
 **Before:**
+
 ```dart
 await plugin.livenessDetection(
   context: context,
@@ -311,15 +426,19 @@ await plugin.livenessDetection(
 ```
 
 **After:**
+
 ```dart
 await plugin.livenessDetection(
   context: context,
   config: LivenessDetectionConfig(
     isEnableSnackBar: true,
-    shuffleListWithSmileLast: true,
+    mustShuffle: true,
+    lastChallenge: LivenessDetectionStep.smile,
     showCurrentStep: true,
     isDarkMode: false,
     // ... other parameters
   ),
 );
 ```
+
+For backward compatibility, existing integrations that still set `shuffleListWithSmileLast: true` continue to work and keep `smile` as the implicit last challenge when `lastChallenge` is not provided.

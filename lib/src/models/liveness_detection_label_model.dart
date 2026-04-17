@@ -1,41 +1,48 @@
 import 'dart:convert';
 
-LivenessDetectionLabelModel livenessDetectionLabelModelFromJson(String str) => LivenessDetectionLabelModel.fromJson(json.decode(str));
+LivenessDetectionLabelModel livenessDetectionLabelModelFromJson(String str) =>
+    LivenessDetectionLabelModel.fromJson(json.decode(str));
 
-String livenessDetectionLabelModelToJson(LivenessDetectionLabelModel data) => json.encode(data.toJson());
+String livenessDetectionLabelModelToJson(LivenessDetectionLabelModel data) =>
+    json.encode(data.toJson());
 
 class LivenessDetectionLabelModel {
-    String? smile;
-    String? lookUp;
-    String? lookDown;
-    String? lookLeft;
-    String? lookRight;
-    String? blink;
+  String? blink;
+  String? lookUp;
+  String? lookDown;
+  String? lookRight;
+  String? lookLeft;
+  String? smile;
+  String? lookForward;
 
-    LivenessDetectionLabelModel({
-        this.smile,
-        this.lookUp,
-        this.lookDown,
-        this.lookLeft,
-        this.lookRight,
-        this.blink,
-    });
+  LivenessDetectionLabelModel({
+    this.blink,
+    this.lookUp,
+    this.lookDown,
+    this.lookRight,
+    this.lookLeft,
+    this.smile,
+    this.lookForward,
+  });
 
-    factory LivenessDetectionLabelModel.fromJson(Map<String, dynamic> json) => LivenessDetectionLabelModel(
-        smile: json["smile"],
+  factory LivenessDetectionLabelModel.fromJson(Map<String, dynamic> json) =>
+      LivenessDetectionLabelModel(
+        blink: json["blink"],
         lookUp: json["lookUp"],
         lookDown: json["lookDown"],
-        lookLeft: json["lookLeft"],
         lookRight: json["lookRight"],
-        blink: json["blink"],
-    );
+        lookLeft: json["lookLeft"],
+        smile: json["smile"],
+        lookForward: json["lookForward"],
+      );
 
-    Map<String, dynamic> toJson() => {
-        "smile": smile,
-        "lookUp": lookUp,
-        "lookDown": lookDown,
-        "lookLeft": lookLeft,
-        "lookRight": lookRight,
-        "blink": blink,
-    };
+  Map<String, dynamic> toJson() => {
+    "blink": blink,
+    "lookUp": lookUp,
+    "lookDown": lookDown,
+    "lookRight": lookRight,
+    "lookLeft": lookLeft,
+    "smile": smile,
+    "lookForward": lookForward,
+  };
 }

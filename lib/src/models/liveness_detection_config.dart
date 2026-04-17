@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:flutter_liveness_detection_randomized_plugin/src/core/enums/liveness_detection_step.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/src/models/liveness_detection_label_model.dart';
 
 class LivenessDetectionConfig {
@@ -14,7 +15,10 @@ class LivenessDetectionConfig {
   final int maxFailedAttempts;
   final int cooldownMinutes;
   final bool isEnableSnackBar;
+  @Deprecated('Use mustShuffle and lastChallenge instead.')
   final bool shuffleListWithSmileLast;
+  final LivenessDetectionStep? lastChallenge;
+  final bool? mustShuffle;
   final bool showCurrentStep;
   final bool isDarkMode;
 
@@ -31,7 +35,10 @@ class LivenessDetectionConfig {
     this.maxFailedAttempts = 3,
     this.cooldownMinutes = 10,
     this.isEnableSnackBar = true,
+    @Deprecated('Use mustShuffle and lastChallenge instead.')
     this.shuffleListWithSmileLast = true,
+    this.lastChallenge,
+    this.mustShuffle,
     this.showCurrentStep = false,
     this.isDarkMode = true,
   }) : assert(

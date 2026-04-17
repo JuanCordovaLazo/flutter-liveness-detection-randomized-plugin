@@ -17,7 +17,7 @@ class _HomeViewState extends State<HomeView> {
   List<String?> capturedImages = [];
   String? imgPath;
   int livenessScenario = 0;
-  final int totalScenarios = 8;
+  final int totalScenarios = 12;
 
   @override
   void initState() {
@@ -110,6 +110,14 @@ class _HomeViewState extends State<HomeView> {
         return 'Max brightness off + No snackbar + Hide steps';
       case 7:
         return 'All features: Custom + Timer + Cooldown + Dark';
+      case 8:
+        return 'Custom order: mustShuffle false keeps declared order';
+      case 9:
+        return 'Custom shuffle: smile forced to the last step';
+      case 10:
+        return 'Custom shuffle: lookForward forced last for frontal capture';
+      case 11:
+        return 'Legacy compatibility: shuffleListWithSmileLast still works';
       default:
         return '';
     }
@@ -128,7 +136,7 @@ class _HomeViewState extends State<HomeView> {
           useCustomizedLabel: false,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: true,
+          lastChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
         );
@@ -143,7 +151,7 @@ class _HomeViewState extends State<HomeView> {
           useCustomizedLabel: false,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: false,
+          mustShuffle: true,
           isDarkMode: false,
           showCurrentStep: true,
         );
@@ -158,7 +166,7 @@ class _HomeViewState extends State<HomeView> {
           useCustomizedLabel: false,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: true,
+          lastChallenge: LivenessDetectionStep.smile,
           isDarkMode: true,
           showCurrentStep: true,
         );
@@ -171,16 +179,17 @@ class _HomeViewState extends State<HomeView> {
           showDurationUiText: false,
           startWithInfoScreen: true,
           useCustomizedLabel: true,
+          mustShuffle: true,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: true,
+          lastChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
           customizedLabel: LivenessDetectionLabelModel(
             blink: 'Kedip 2-3 Kali',
             lookDown: 'Lihat ke Bawah',
-            lookLeft: 'Lihat ke Kiri',
             lookRight: 'Lihat ke Kanan',
+            lookLeft: 'Lihat ke Kiri',
             lookUp: 'Lihat ke Atas',
             smile: 'Tersenyum Lebar',
           ),
@@ -194,9 +203,9 @@ class _HomeViewState extends State<HomeView> {
           showDurationUiText: false,
           startWithInfoScreen: false,
           useCustomizedLabel: true,
+          mustShuffle: false,
           enableCooldownOnFailure: false,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: false,
           isDarkMode: false,
           showCurrentStep: true,
           customizedLabel: LivenessDetectionLabelModel(
@@ -221,7 +230,7 @@ class _HomeViewState extends State<HomeView> {
           maxFailedAttempts: 2,
           cooldownMinutes: 5,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: true,
+          lastChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
         );
@@ -236,7 +245,7 @@ class _HomeViewState extends State<HomeView> {
           useCustomizedLabel: false,
           enableCooldownOnFailure: false,
           isEnableSnackBar: false,
-          shuffleListWithSmileLast: false,
+          mustShuffle: true,
           isDarkMode: false,
           showCurrentStep: false,
         );
@@ -253,17 +262,104 @@ class _HomeViewState extends State<HomeView> {
           maxFailedAttempts: 3,
           cooldownMinutes: 10,
           isEnableSnackBar: true,
-          shuffleListWithSmileLast: true,
+          mustShuffle: true,
+          lastChallenge: LivenessDetectionStep.smile,
           isDarkMode: true,
           showCurrentStep: true,
           customizedLabel: LivenessDetectionLabelModel(
             blink: '👁️ Kedipkan Mata',
             lookDown: '⬇️ Lihat Bawah',
-            lookLeft: '⬅️ Lihat Kiri',
             lookRight: '➡️ Lihat Kanan',
+            lookLeft: '⬅️ Lihat Kiri',
             lookUp: '⬆️ Lihat Atas',
             smile: '😊 Senyum Manis',
           ),
+        );
+      case 8: // Explicit order without shuffle
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.medium,
+          imageQuality: 90,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: true,
+          mustShuffle: false,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          isDarkMode: false,
+          showCurrentStep: true,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Step 1: Blink',
+            lookUp: 'Step 2: Look Up',
+            lookDown: '',
+            lookRight: 'Step 3: Turn Right',
+            lookLeft: '',
+            smile: 'Step 4: Smile',
+            lookForward: 'Step 5: Face Forward',
+          ),
+        );
+      case 9: // Shuffle with smile last
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.medium,
+          imageQuality: 90,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: true,
+          mustShuffle: true,
+          lastChallenge: LivenessDetectionStep.smile,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          isDarkMode: false,
+          showCurrentStep: true,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Blink',
+            lookUp: 'Look Up',
+            lookDown: 'Look Down',
+            lookRight: 'Look Right',
+            lookLeft: 'Look Left',
+            smile: 'Smile Last',
+          ),
+        );
+      case 10: // Shuffle with lookForward last
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.medium,
+          imageQuality: 90,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: true,
+          mustShuffle: true,
+          lastChallenge: LivenessDetectionStep.lookForward,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          isDarkMode: false,
+          showCurrentStep: true,
+          customizedLabel: LivenessDetectionLabelModel(
+            blink: 'Blink',
+            lookUp: 'Look Up',
+            lookDown: 'Look Down',
+            lookRight: 'Look Right',
+            lookLeft: 'Look Left',
+            smile: 'Smile',
+            lookForward: 'Face Forward For Capture',
+          ),
+        );
+      case 11: // Legacy compatibility
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.medium,
+          imageQuality: 90,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: false,
+          mustShuffle: true,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          // ignore: deprecated_member_use
+          shuffleListWithSmileLast: true,
+          isDarkMode: false,
+          showCurrentStep: true,
         );
       default:
         return LivenessDetectionConfig();
