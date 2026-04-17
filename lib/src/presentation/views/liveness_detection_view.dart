@@ -2,11 +2,30 @@
 import 'package:flutter_liveness_detection_randomized_plugin/index.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/src/core/constants/liveness_detection_step_constant.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:image/image.dart' as img;
 import 'package:path_provider/path_provider.dart';
 
 List<CameraDescription> availableCams = [];
+
+class _ImageCompressionRequest {
+  final Uint8List bytes;
+  final int quality;
+
+  const _ImageCompressionRequest({required this.bytes, required this.quality});
+}
+
+Future<List<int>?> _encodeCompressedJpg(
+  _ImageCompressionRequest request,
+) async {
+  final img.Image? originalImage = img.decodeImage(request.bytes);
+  if (originalImage == null) {
+    return null;
+  }
+
+  return img.encodeJpg(originalImage, quality: request.quality);
+}
 
 class LivenessDetectionView extends StatefulWidget {
   final LivenessDetectionConfig config;
@@ -65,23 +84,28 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   Future<XFile?> _compressImage(XFile originalFile) async {
     final int quality = widget.config.imageQuality;
 
-    if (quality >= 100) {
+    if (quality >= 95) {
       return originalFile;
     }
 
     try {
       final bytes = await originalFile.readAsBytes();
 
-      final img.Image? originalImage = img.decodeImage(bytes);
-      if (originalImage == null) {
-        return originalFile;
-      }
-
       final tempDir = await getTemporaryDirectory();
       final String targetPath =
           '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-      final compressedBytes = img.encodeJpg(originalImage, quality: quality);
+      final compressedBytes = await compute(
+        _encodeCompressedJpg,
+        _ImageCompressionRequest(
+          bytes: Uint8List.fromList(bytes),
+          quality: quality,
+        ),
+      );
+
+      if (compressedBytes == null) {
+        return originalFile;
+      }
 
       final File compressedFile = await File(
         targetPath,
