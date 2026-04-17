@@ -39,7 +39,7 @@ class CircularProgressWidget extends StatefulWidget {
 class _CircularProgressWidgetState extends State<CircularProgressWidget>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   AnimationController? _animationController;
-  Animation? _animation;
+  Animation<double>? _animation;
   double _current = 0.0;
 
   @override
@@ -49,18 +49,16 @@ class _CircularProgressWidgetState extends State<CircularProgressWidget>
       vsync: this,
       duration: widget.duration,
     );
-    _animation = Tween(begin: 0.0, end: widget.current).animate(
-      CurvedAnimation(
-        parent: _animationController!,
-        curve: widget.curve,
-      ),
-    )..addListener(() {
-        if (mounted) {
-          setState(() {
-            _current = _animation!.value;
-          });
-        }
-      });
+    _animation =
+        Tween(begin: 0.0, end: widget.current).animate(
+          CurvedAnimation(parent: _animationController!, curve: widget.curve),
+        )..addListener(() {
+          if (mounted) {
+            setState(() {
+              _current = _animation!.value;
+            });
+          }
+        });
 
     _animationController!.forward();
   }
@@ -74,25 +72,25 @@ class _CircularProgressWidgetState extends State<CircularProgressWidget>
   @override
   void didUpdateWidget(CircularProgressWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.current != widget.current) {
-      if (_animationController != null) {
-        _animation = Tween(
-          begin: oldWidget.current,
-          end: widget.current,
-        ).animate(
-          CurvedAnimation(
-            parent: _animationController!,
-            curve: widget.curve,
-          ),
-        );
-        _animationController?.forward(from: 0.0);
-      } else {
-        _updateProgress();
-      }
+    if (_animationController == null) {
+      _updateProgress();
+      return;
+    }
+
+    if (oldWidget.duration != widget.duration) {
+      _animationController!.duration = widget.duration;
+    }
+
+    if (oldWidget.current != widget.current ||
+        oldWidget.curve != widget.curve) {
+      _animation = Tween<double>(begin: _current, end: widget.current).animate(
+        CurvedAnimation(parent: _animationController!, curve: widget.curve),
+      );
+      _animationController!.forward(from: 0.0);
     }
   }
 
-  _updateProgress() {
+  void _updateProgress() {
     if (mounted) {
       setState(() => _current = widget.current);
     }
@@ -123,9 +121,7 @@ class _CircularProgressWidgetState extends State<CircularProgressWidget>
                 child: Padding(
                   padding: EdgeInsets.all(widget.heightLine),
                   child: Container(
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
                     clipBehavior: Clip.antiAlias,
                     child: widget.child,
                   ),

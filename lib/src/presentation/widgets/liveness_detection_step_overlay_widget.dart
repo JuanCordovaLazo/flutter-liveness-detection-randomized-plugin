@@ -42,6 +42,13 @@ class LivenessDetectionStepOverlayWidget extends StatefulWidget {
 
 class LivenessDetectionStepOverlayWidgetState
     extends State<LivenessDetectionStepOverlayWidget> {
+  static const Duration _stepPageTransitionDuration = Duration(
+    milliseconds: 200,
+  );
+  static const Duration _progressAnimationDuration = Duration(
+    milliseconds: 400,
+  );
+
   int get currentIndex => _currentIndex;
 
   bool _isLoading = false;
@@ -116,6 +123,7 @@ class LivenessDetectionStepOverlayWidgetState
       unselectedColor: Colors.grey,
       selectedColor: Colors.green,
       heightLine: _heightLine,
+      duration: _progressAnimationDuration,
       current: _currentStepIndicator,
       maxStep: _indicatorMaxStep,
       child: Transform.scale(
@@ -144,14 +152,12 @@ class LivenessDetectionStepOverlayWidgetState
 
   Future<void> _handleNextStep() async {
     _showLoader();
-    await Future.delayed(const Duration(milliseconds: 100));
     await _pageController.nextPage(
-      duration: const Duration(milliseconds: 1),
-      curve: Curves.easeIn,
+      duration: _stepPageTransitionDuration,
+      curve: Curves.easeInOut,
     );
-    await Future.delayed(const Duration(seconds: 1));
-    _hideLoader();
     _updateState();
+    _hideLoader();
   }
 
   Future<void> _handleCompletion() async {
