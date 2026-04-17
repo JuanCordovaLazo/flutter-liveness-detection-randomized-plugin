@@ -3,6 +3,7 @@ import 'package:flutter_liveness_detection_randomized_plugin/index.dart';
 class LivenessFaceOrientationHelper {
   static const double defaultForwardYawThreshold = 12.0;
   static const double defaultForwardPitchThreshold = 12.0;
+  static const double defaultSideTurnYawThreshold = 16.0;
   static const Duration defaultLookForwardHoldDuration = Duration(
     milliseconds: 400,
   );
@@ -25,6 +26,31 @@ class LivenessFaceOrientationHelper {
     Duration holdDuration = defaultLookForwardHoldDuration,
   }) {
     return now.difference(startedAt) >= holdDuration;
+  }
+
+  static bool hasExceededFaceLossGracePeriod({
+    required int faceLossFrameCount,
+    required int gracePeriodFrames,
+  }) {
+    return faceLossFrameCount >= gracePeriodFrames;
+  }
+
+  static bool isHeadTurnedForStep({
+    required LivenessDetectionStep step,
+    required double? headEulerAngleY,
+    double minYawThreshold = defaultSideTurnYawThreshold,
+    required bool isIOS,
+  }) {
+    final double yaw = headEulerAngleY ?? 0;
+
+    switch (step) {
+      case LivenessDetectionStep.lookRight:
+        return isIOS ? yaw > minYawThreshold : yaw < -minYawThreshold;
+      case LivenessDetectionStep.lookLeft:
+        return isIOS ? yaw < -minYawThreshold : yaw > minYawThreshold;
+      default:
+        return false;
+    }
   }
 
   static bool isFaceAlignedForStep({

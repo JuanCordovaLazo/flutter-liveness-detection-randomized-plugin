@@ -88,6 +88,9 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     isDarkMode: false, // Dark/light theme
     showCurrentStep: true, // Show step counter
     isEnableSnackBar: true, // Show result notifications
+    backButtonText: 'Volver', // Top-left back label
+    userFaceFoundText: 'Rostro detectado', // Face detected status label
+    userFaceNotFoundText: 'Rostro no detectado', // Face missing status label
     mustShuffle: true, // Shuffle enabled challenges
     lastChallenge: LivenessDetectionStep.lookForward, // Optional fixed last challenge
     takePhotoOnChallenge: LivenessDetectionStep.lookForward, // Optional challenge that triggers the photo capture
@@ -132,6 +135,9 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
 - `isDarkMode`: Dark theme mode (default: true)
 - `showCurrentStep`: Show current step number (default: false)
 - `isEnableSnackBar`: Show success/failure notifications (default: true)
+- `backButtonText`: Top-left back label text (default: `Back`)
+- `userFaceFoundText`: Status text displayed when the face is detected (default: `User Face Found`)
+- `userFaceNotFoundText`: Status text displayed when the face is not detected (default: `User Face Not Found...`)
 - `mustShuffle`: Shuffle the effective challenge list (default: true)
 - `lastChallenge`: Optional fixed last challenge from `LivenessDetectionStep`
 - `takePhotoOnChallenge`: Optional challenge that triggers the photo capture; if absent from the effective list, the plugin falls back to the final effective challenge

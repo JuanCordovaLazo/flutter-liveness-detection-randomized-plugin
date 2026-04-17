@@ -14,6 +14,9 @@ class LivenessDetectionStepOverlayWidget extends StatefulWidget {
   final bool isDarkMode;
   final bool showDurationUiText;
   final int? duration;
+  final String backButtonText;
+  final String userFaceFoundText;
+  final String userFaceNotFoundText;
 
   const LivenessDetectionStepOverlayWidget({
     super.key,
@@ -27,6 +30,9 @@ class LivenessDetectionStepOverlayWidget extends StatefulWidget {
     this.isDarkMode = true,
     this.showDurationUiText = false,
     this.duration,
+    this.backButtonText = 'Back',
+    this.userFaceFoundText = 'User Face Found',
+    this.userFaceNotFoundText = 'User Face Not Found...',
   });
 
   @override
@@ -201,7 +207,7 @@ class LivenessDetectionStepOverlayWidgetState
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Back',
+                          widget.backButtonText,
                           style: TextStyle(
                             color: widget.isDarkMode
                                 ? Colors.white
@@ -232,7 +238,7 @@ class LivenessDetectionStepOverlayWidgetState
                       ],
                     )
                   : Text(
-                      'Back',
+                      widget.backButtonText,
                       style: TextStyle(
                         color: widget.isDarkMode ? Colors.white : Colors.black,
                       ),
@@ -312,7 +318,9 @@ class LivenessDetectionStepOverlayWidgetState
         ),
         const SizedBox(width: 16),
         Text(
-          widget.isFaceDetected ? 'User Face Found' : 'User Face Not Found...',
+          widget.isFaceDetected
+              ? widget.userFaceFoundText
+              : widget.userFaceNotFoundText,
           style: TextStyle(
             color: widget.isDarkMode ? Colors.white : Colors.black,
           ),

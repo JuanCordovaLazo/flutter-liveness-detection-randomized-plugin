@@ -9,6 +9,9 @@ void exampleUsage() {
   final config1 = LivenessDetectionConfig(
     useCustomizedLabel: true,
     mustShuffle: false,
+    backButtonText: 'Volver',
+    userFaceFoundText: 'Rostro detectado',
+    userFaceNotFoundText: 'Rostro no detectado',
     customizedLabel: LivenessDetectionLabelModel(
       blink: '', // Empty string = skip this challenge
       lookUp: 'Tengok Atas', // Custom label
@@ -27,6 +30,9 @@ void exampleUsage() {
     mustShuffle: true,
     lastChallenge: LivenessDetectionStep.lookForward,
     takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+    backButtonText: 'Volver',
+    userFaceFoundText: 'Rostro detectado',
+    userFaceNotFoundText: 'Rostro no detectado',
     customizedLabel: LivenessDetectionLabelModel(
       blink: 'Kedipkan Mata',
       lookUp: 'Lihat Atas',
@@ -92,6 +98,9 @@ void exampleUsage() {
     mustShuffle: false,
     lastChallenge: LivenessDetectionStep.smile,
     takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+    backButtonText: 'Volver',
+    userFaceFoundText: 'Rostro detectado',
+    userFaceNotFoundText: 'Rostro no detectado',
     customizedLabel: LivenessDetectionLabelModel(
       blink: 'Step 1',
       lookUp: 'Step 2',

@@ -22,6 +22,9 @@ class LivenessDetectionConfig {
   final bool? mustShuffle;
   final bool showCurrentStep;
   final bool isDarkMode;
+  final String backButtonText;
+  final String userFaceFoundText;
+  final String userFaceNotFoundText;
 
   LivenessDetectionConfig({
     this.startWithInfoScreen = false,
@@ -43,6 +46,9 @@ class LivenessDetectionConfig {
     this.mustShuffle,
     this.showCurrentStep = false,
     this.isDarkMode = true,
+    this.backButtonText = 'Back',
+    this.userFaceFoundText = 'User Face Found',
+    this.userFaceNotFoundText = 'User Face Not Found...',
   }) : assert(
          !useCustomizedLabel || customizedLabel != null,
          'customizedLabel must not be null when useCustomizedLabel is true',

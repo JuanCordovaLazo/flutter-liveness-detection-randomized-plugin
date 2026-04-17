@@ -142,6 +142,9 @@ class _HomeViewState extends State<HomeView> {
           takePhotoOnChallenge: LivenessDetectionStep.smile,
           isDarkMode: false,
           showCurrentStep: true,
+          backButtonText: 'Volver',
+          userFaceFoundText: 'Rostro detectado',
+          userFaceNotFoundText: 'Rostro no detectado',
         );
       case 1: // Random shuffle
         return LivenessDetectionConfig(
@@ -339,6 +342,9 @@ class _HomeViewState extends State<HomeView> {
           isEnableSnackBar: true,
           isDarkMode: false,
           showCurrentStep: true,
+          backButtonText: 'Volver',
+          userFaceFoundText: 'Rostro detectado',
+          userFaceNotFoundText: 'Rostro no detectado',
           customizedLabel: LivenessDetectionLabelModel(
             blink: 'Blink',
             lookUp: 'Look Up',

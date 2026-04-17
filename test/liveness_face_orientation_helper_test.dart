@@ -50,5 +50,56 @@ void main() {
         isTrue,
       );
     });
+
+    test('validates right turn on Android with relaxed threshold', () {
+      final isTurnedRight = LivenessFaceOrientationHelper.isHeadTurnedForStep(
+        step: LivenessDetectionStep.lookRight,
+        headEulerAngleY: -17,
+        minYawThreshold: 16,
+        isIOS: false,
+      );
+
+      expect(isTurnedRight, isTrue);
+    });
+
+    test('validates left turn on Android with relaxed threshold', () {
+      final isTurnedLeft = LivenessFaceOrientationHelper.isHeadTurnedForStep(
+        step: LivenessDetectionStep.lookLeft,
+        headEulerAngleY: 17,
+        minYawThreshold: 16,
+        isIOS: false,
+      );
+
+      expect(isTurnedLeft, isTrue);
+    });
+
+    test('validates right turn on iOS with relaxed threshold', () {
+      final isTurnedRight = LivenessFaceOrientationHelper.isHeadTurnedForStep(
+        step: LivenessDetectionStep.lookRight,
+        headEulerAngleY: 17,
+        minYawThreshold: 16,
+        isIOS: true,
+      );
+
+      expect(isTurnedRight, isTrue);
+    });
+
+    test('detects face-loss grace period correctly', () {
+      expect(
+        LivenessFaceOrientationHelper.hasExceededFaceLossGracePeriod(
+          faceLossFrameCount: 2,
+          gracePeriodFrames: 3,
+        ),
+        isFalse,
+      );
+
+      expect(
+        LivenessFaceOrientationHelper.hasExceededFaceLossGracePeriod(
+          faceLossFrameCount: 3,
+          gracePeriodFrames: 3,
+        ),
+        isTrue,
+      );
+    });
   });
 }

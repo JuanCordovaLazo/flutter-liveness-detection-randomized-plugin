@@ -18,6 +18,8 @@ class LivenessDetectionView extends StatefulWidget {
 }
 
 class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
+  static const int _faceLossGraceFrames = 3;
+
   // Camera related variables
   CameraController? _cameraController;
   int _cameraIndex = 0;
@@ -32,6 +34,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
   List<LivenessDetectionStepItem> _shuffledSteps = [];
   DateTime? _lookForwardHoldStartedAt;
   XFile? _capturedChallengeImage;
+  int _faceLossFrameCount = 0;
 
   // Brightness Screen
   Future<void> setApplicationBrightness(double brightness) async {
@@ -239,9 +242,19 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         inputImage.metadata?.rotation != null) {
       if (faces.isEmpty) {
         _resetLookForwardHold();
-        _resetSteps();
-        if (mounted) setState(() => _faceDetectedState = false);
+        _faceLossFrameCount++;
+        final bool shouldReset =
+            LivenessFaceOrientationHelper.hasExceededFaceLossGracePeriod(
+              faceLossFrameCount: _faceLossFrameCount,
+              gracePeriodFrames: _faceLossGraceFrames,
+            );
+
+        if (shouldReset) {
+          _resetSteps();
+          if (mounted) setState(() => _faceDetectedState = false);
+        }
       } else {
+        _faceLossFrameCount = 0;
         if (mounted) setState(() => _faceDetectedState = true);
         final currentIndex = _stepsKey.currentState?.currentIndex ?? 0;
         List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
@@ -305,12 +318,13 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   Future<void> _completeStep({required LivenessDetectionStep step}) async {
     final bool shouldCaptureOnThisStep = _shouldCaptureOnThisStep(step);
-    if (mounted) setState(() {});
-    await _stepsKey.currentState?.nextPage();
 
     if (shouldCaptureOnThisStep) {
       await _takePicture(continueFlow: true);
     }
+
+    if (mounted) setState(() {});
+    await _stepsKey.currentState?.nextPage();
 
     _stopProcessing();
   }
@@ -412,6 +426,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     List<LivenessDetectionStepItem> currentSteps = _getStepsToUse();
     _resetLookForwardHold();
     _capturedChallengeImage = null;
+    _faceLossFrameCount = 0;
 
     for (var step in currentSteps) {
       final index = currentSteps.indexWhere((p1) => p1.step == step.step);
@@ -494,6 +509,9 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
           showDurationUiText: widget.config.showDurationUiText,
           isDarkMode: widget.config.isDarkMode,
           isFaceDetected: _faceDetectedState,
+          backButtonText: widget.config.backButtonText,
+          userFaceFoundText: widget.config.userFaceFoundText,
+          userFaceNotFoundText: widget.config.userFaceNotFoundText,
           camera: CameraPreview(_cameraController!),
           key: _stepsKey,
           steps: _getStepsToUse(),
@@ -547,6 +565,16 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     return min(15.0, max(8.0, rotationAngle / 3));
   }
 
+  double _getSideTurnThreshold() {
+    final headTurnThreshold =
+        FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
+                .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
+            as LivenessThresholdHead?;
+    final double rotationAngle = headTurnThreshold?.rotationAngle ?? 45.0;
+
+    return min(20.0, max(14.0, rotationAngle / 2.5));
+  }
+
   Future<void> _handlingBlinkStep({
     required Face face,
     required LivenessDetectionStep step,
@@ -569,26 +597,17 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     required Face face,
     required LivenessDetectionStep step,
   }) async {
-    if (Platform.isAndroid) {
-      final headTurnThreshold =
-          FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
-                  .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-              as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) <
-          (headTurnThreshold?.rotationAngle ?? -30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    } else if (Platform.isIOS) {
-      final headTurnThreshold =
-          FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
-                  .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-              as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) >
-          (headTurnThreshold?.rotationAngle ?? 30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
+    final bool isTurnedRight =
+        LivenessFaceOrientationHelper.isHeadTurnedForStep(
+          step: step,
+          headEulerAngleY: face.headEulerAngleY,
+          minYawThreshold: _getSideTurnThreshold(),
+          isIOS: Platform.isIOS,
+        );
+
+    if (isTurnedRight) {
+      _startProcessing();
+      await _completeStep(step: step);
     }
   }
 
@@ -596,26 +615,16 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
     required Face face,
     required LivenessDetectionStep step,
   }) async {
-    if (Platform.isAndroid) {
-      final headTurnThreshold =
-          FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
-                  .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-              as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) >
-          (headTurnThreshold?.rotationAngle ?? 30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
-    } else if (Platform.isIOS) {
-      final headTurnThreshold =
-          FlutterLivenessDetectionRandomizedPlugin.instance.thresholdConfig
-                  .firstWhereOrNull((p0) => p0 is LivenessThresholdHead)
-              as LivenessThresholdHead?;
-      if ((face.headEulerAngleY ?? 0) <
-          (headTurnThreshold?.rotationAngle ?? -30)) {
-        _startProcessing();
-        await _completeStep(step: step);
-      }
+    final bool isTurnedLeft = LivenessFaceOrientationHelper.isHeadTurnedForStep(
+      step: step,
+      headEulerAngleY: face.headEulerAngleY,
+      minYawThreshold: _getSideTurnThreshold(),
+      isIOS: Platform.isIOS,
+    );
+
+    if (isTurnedLeft) {
+      _startProcessing();
+      await _completeStep(step: step);
     }
   }
 
