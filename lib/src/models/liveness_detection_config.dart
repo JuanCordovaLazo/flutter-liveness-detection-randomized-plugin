@@ -10,6 +10,8 @@ class LivenessDetectionConfig {
   final LivenessDetectionLabelModel? customizedLabel;
   final bool isEnableMaxBrightness;
   final int imageQuality;
+  final int? maxWidth;
+  final int? maxHeight;
   final ResolutionPreset cameraResolution;
   final bool enableCooldownOnFailure;
   final int maxFailedAttempts;
@@ -34,6 +36,8 @@ class LivenessDetectionConfig {
     this.customizedLabel,
     this.isEnableMaxBrightness = true,
     this.imageQuality = 100,
+    this.maxWidth,
+    this.maxHeight,
     this.cameraResolution = ResolutionPreset.high,
     this.enableCooldownOnFailure = true,
     this.maxFailedAttempts = 3,
@@ -52,5 +56,13 @@ class LivenessDetectionConfig {
   }) : assert(
          !useCustomizedLabel || customizedLabel != null,
          'customizedLabel must not be null when useCustomizedLabel is true',
+       ),
+       assert(
+         maxWidth == null || maxWidth > 0,
+         'maxWidth must be greater than 0',
+       ),
+       assert(
+         maxHeight == null || maxHeight > 0,
+         'maxHeight must be greater than 0',
        );
 }

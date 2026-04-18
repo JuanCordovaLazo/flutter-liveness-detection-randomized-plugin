@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:flutter_liveness_detection_randomized_plugin/index.dart';
 import 'package:flutter_liveness_detection_randomized_plugin/src/core/constants/liveness_detection_step_constant.dart';
+import 'package:flutter_liveness_detection_randomized_plugin/src/core/utils/liveness_image_resizer.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:screen_brightness/screen_brightness.dart';
@@ -12,8 +13,15 @@ List<CameraDescription> availableCams = [];
 class _ImageCompressionRequest {
   final Uint8List bytes;
   final int quality;
+  final int? maxWidth;
+  final int? maxHeight;
 
-  const _ImageCompressionRequest({required this.bytes, required this.quality});
+  const _ImageCompressionRequest({
+    required this.bytes,
+    required this.quality,
+    this.maxWidth,
+    this.maxHeight,
+  });
 }
 
 Future<List<int>?> _encodeCompressedJpg(
@@ -24,7 +32,13 @@ Future<List<int>?> _encodeCompressedJpg(
     return null;
   }
 
-  return img.encodeJpg(originalImage, quality: request.quality);
+  final img.Image resizedImage = resizeImageIfNeeded(
+    image: originalImage,
+    maxWidth: request.maxWidth,
+    maxHeight: request.maxHeight,
+  );
+
+  return img.encodeJpg(resizedImage, quality: request.quality);
 }
 
 class LivenessDetectionView extends StatefulWidget {
@@ -83,8 +97,14 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
 
   Future<XFile?> _compressImage(XFile originalFile) async {
     final int quality = widget.config.imageQuality;
+    final int? maxWidth = widget.config.maxWidth;
+    final int? maxHeight = widget.config.maxHeight;
 
-    if (quality >= 95) {
+    if (!shouldPostProcessCapturedImage(
+      quality: quality,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+    )) {
       return originalFile;
     }
 
@@ -100,6 +120,8 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         _ImageCompressionRequest(
           bytes: Uint8List.fromList(bytes),
           quality: quality,
+          maxWidth: maxWidth,
+          maxHeight: maxHeight,
         ),
       );
 

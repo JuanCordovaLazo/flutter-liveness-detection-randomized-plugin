@@ -17,7 +17,7 @@ class _HomeViewState extends State<HomeView> {
   List<String?> capturedImages = [];
   String? imgPath;
   int livenessScenario = 0;
-  final int totalScenarios = 13;
+  final int totalScenarios = 14;
 
   @override
   void initState() {
@@ -120,6 +120,8 @@ class _HomeViewState extends State<HomeView> {
         return 'Custom shuffle: no implicit last challenge';
       case 12:
         return 'Photo on lookForward, then finish with smile as the last challenge';
+      case 13:
+        return 'Image output constrained to 1024x1024 while preserving aspect ratio';
       default:
         return '';
     }
@@ -403,6 +405,24 @@ class _HomeViewState extends State<HomeView> {
             smile: 'Step 5: Final Smile',
             lookForward: 'Step 4: Face Forward And Capture',
           ),
+        );
+      case 13: // Resize output after capture
+        return LivenessDetectionConfig(
+          cameraResolution: ResolutionPreset.high,
+          imageQuality: 95,
+          maxWidth: 1024,
+          maxHeight: 1024,
+          isEnableMaxBrightness: true,
+          durationLivenessVerify: 45,
+          startWithInfoScreen: true,
+          useCustomizedLabel: false,
+          enableCooldownOnFailure: false,
+          isEnableSnackBar: true,
+          mustShuffle: true,
+          lastChallenge: LivenessDetectionStep.lookForward,
+          takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+          isDarkMode: false,
+          showCurrentStep: true,
         );
       default:
         return LivenessDetectionConfig();

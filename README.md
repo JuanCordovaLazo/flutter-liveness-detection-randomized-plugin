@@ -77,6 +77,8 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     // Camera & Image Settings
     cameraResolution: ResolutionPreset.medium, // Camera resolution
     imageQuality: 100, // Image quality (0-100)
+    maxWidth: 1024, // Optional max output width in pixels
+    maxHeight: 1024, // Optional max output height in pixels
     isEnableMaxBrightness: true, // Auto brightness adjustment
 
     // Detection Settings
@@ -121,7 +123,11 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
 
 - `cameraResolution`: Camera quality (ResolutionPreset.low/medium/high)
 - `imageQuality`: Output image quality 0-100 (default: 100)
+- `maxWidth`: Maximum output width in pixels while preserving aspect ratio (default: null)
+- `maxHeight`: Maximum output height in pixels while preserving aspect ratio (default: null)
 - `isEnableMaxBrightness`: Auto brightness adjustment (default: true)
+
+When `maxWidth` and/or `maxHeight` are set, the captured image is resized after capture without changing the liveness detection flow. This is independent from `cameraResolution`, which still controls the camera capture preset.
 
 ### Detection Settings
 
