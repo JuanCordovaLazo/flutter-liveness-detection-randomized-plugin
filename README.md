@@ -18,6 +18,15 @@ Feel free to fork and modify this package to suit your needs - that's much more 
 
 https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 
+## Update 1.3.0
+
+- ✨ Added `lookForward` as an optional forward-alignment challenge before capture
+- 🧭 Added `lastChallenge`, `mustShuffle`, and `takePhotoOnChallenge` for explicit challenge-flow control
+- 🌐 Added `backButtonText`, `userFaceFoundText`, and `userFaceNotFoundText` for localized UI text customization
+- 🖼️ Added `maxWidth` and `maxHeight` for post-capture image resizing while preserving aspect ratio
+- ⚡ Improved post-capture image processing, ML Kit frame handling, and step transition animations
+- 🧪 Added test coverage for challenge flow building, forward-face alignment, and image resizing
+
 ## Update 1.2.1
 
 - ⬆️ **Kotlin updated to 2.1.0** for better performance and support 16KB google page size policy
@@ -54,9 +63,11 @@ Face stretching already fixed on this version
 - ✅ High accuracy liveness verification
 - 🚀 Simple integration API
 - 🎭 Customizable liveness challenge labels
+- 🌐 Localizable back button and face detection status texts
 - ⏳ Flexible security verification duration
 - 🎲 Adjustable number of liveness challenges
 - 🛠️ Adjustable image quality result
+- 🖼️ Optional max output width and height for captured images
 - ⏱️ Automatic cooldown after failed attempts
 
 ## Getting Started 🌟
@@ -65,7 +76,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_liveness_detection_randomized_plugin: ^1.2.1
+  flutter_liveness_detection_randomized_plugin: ^1.3.0
 ```
 
 ## Usage 🚀

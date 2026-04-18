@@ -1,4 +1,4 @@
-# Unreleased
+# 1.3.0 🚀
 
 ## New Features
 
@@ -6,11 +6,23 @@
 - Added `lastChallenge` to pin any enabled challenge to the final position
 - Added `mustShuffle` to control whether the effective challenge list is shuffled or preserved as declared
 - Added `takePhotoOnChallenge` to decide which effective challenge triggers the photo capture
+- Added `backButtonText`, `userFaceFoundText`, and `userFaceNotFoundText` for localized UI text customization
+- Added `maxWidth` and `maxHeight` to constrain captured image output size while preserving aspect ratio
+- Added `lookForward` to `LivenessDetectionLabelModel` for custom labeling of the forward-alignment step
 
 ## Improvements
 
 - Centralized effective challenge list building for default and customized flows
 - Final capture can now be decoupled from the final challenge through `takePhotoOnChallenge`
+- Added post-capture image processing to resize and compress the output image when needed
+- Optimized ML Kit face detection configuration and frame processing error handling
+- Improved step overlay and circular progress animations with shorter, smoother transitions
+- Expanded automated coverage with tests for challenge flow building, forward-face alignment, and image resizing
+
+## Documentation
+
+- Updated README and examples to document the new challenge flow controls, localized text options, and image resizing settings
+- Expanded the example scenarios to cover the new flow configuration combinations
 
 ## Compatibility
 
