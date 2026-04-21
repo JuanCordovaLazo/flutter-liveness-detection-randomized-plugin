@@ -1,3 +1,18 @@
+# 1.3.1 🚀
+
+## New Features
+
+- Added `faceLossGraceFrames` to configure face loss grace period (default: 3 frames)
+- Added `frameProcessingInterval` to configure frame processing interval (default: 100ms)
+
+## Improvements
+
+- Made face loss detection timing and frame processing interval configurable for better control over detection sensitivity
+- Updated all test files with new configuration parameters
+- All tests passing with improved configuration coverage
+
+---
+
 # 1.3.0 🚀
 
 ## New Features

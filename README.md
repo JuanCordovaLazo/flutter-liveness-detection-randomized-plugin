@@ -18,6 +18,13 @@ Feel free to fork and modify this package to suit your needs - that's much more 
 
 https://github.com/user-attachments/assets/f7266dc9-c4a2-4fba-8684-0ead2f678180
 
+## Update 1.3.1
+
+- 🎯 Added `faceLossGraceFrames` to configure face loss grace period (default: 3 frames)
+- ⏱️ Added `frameProcessingInterval` to configure frame processing interval (default: 100ms)
+- 🛠️ Made face loss detection timing and frame processing interval fully configurable
+- ✅ Updated all test files with new configuration parameters
+
 ## Update 1.3.0
 
 - ✨ Added `lookForward` as an optional forward-alignment challenge before capture
@@ -96,6 +103,8 @@ final String? response = await FlutterLivenessDetectionRandomizedPlugin.instance
     durationLivenessVerify: 60, // Detection timeout in seconds
     showDurationUiText: false, // Show countdown timer
     startWithInfoScreen: true, // Show tutorial screen
+    faceLossGraceFrames: 3, // Frames to wait before resetting when face is lost
+    frameProcessingInterval: Duration(milliseconds: 100), // Minimum interval between frame processing
 
     // UI Settings
     isDarkMode: false, // Dark/light theme
@@ -145,6 +154,8 @@ When `maxWidth` and/or `maxHeight` are set, the captured image is resized after 
 - `durationLivenessVerify`: Detection timeout in seconds (default: 45)
 - `showDurationUiText`: Show countdown timer (default: false)
 - `startWithInfoScreen`: Show tutorial before detection (default: false)
+- `faceLossGraceFrames`: Number of frames to wait before resetting detection when face is lost (default: 3)
+- `frameProcessingInterval`: Minimum interval between frame processing in milliseconds (default: 100ms)
 
 ### UI Settings
 
