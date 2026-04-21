@@ -7,6 +7,8 @@ void main() {
       final config = LivenessDetectionConfig(
         useCustomizedLabel: true,
         mustShuffle: false,
+        faceLossGraceFrames: 3,
+        frameProcessingInterval: const Duration(milliseconds: 100),
         customizedLabel: LivenessDetectionLabelModel(
           blink: 'Blink',
           lookUp: 'Look Up',
@@ -39,6 +41,8 @@ void main() {
           useCustomizedLabel: true,
           mustShuffle: true,
           lastChallenge: LivenessDetectionStep.smile,
+          faceLossGraceFrames: 3,
+          frameProcessingInterval: const Duration(milliseconds: 100),
           customizedLabel: LivenessDetectionLabelModel(
             blink: 'Blink',
             lookUp: 'Look Up',
@@ -69,6 +73,8 @@ void main() {
         useCustomizedLabel: true,
         mustShuffle: true,
         lastChallenge: LivenessDetectionStep.lookForward,
+        faceLossGraceFrames: 3,
+        frameProcessingInterval: const Duration(milliseconds: 100),
         customizedLabel: LivenessDetectionLabelModel(
           blink: 'Blink',
           lookUp: 'Look Up',
@@ -99,6 +105,8 @@ void main() {
           useCustomizedLabel: true,
           mustShuffle: true,
           lastChallenge: LivenessDetectionStep.lookForward,
+          faceLossGraceFrames: 3,
+          frameProcessingInterval: const Duration(milliseconds: 100),
           customizedLabel: LivenessDetectionLabelModel(
             blink: 'Blink',
             lookUp: 'Look Up',
@@ -129,6 +137,8 @@ void main() {
         final config = LivenessDetectionConfig(
           useCustomizedLabel: false,
           mustShuffle: true,
+          faceLossGraceFrames: 3,
+          frameProcessingInterval: const Duration(milliseconds: 100),
           // ignore: deprecated_member_use_from_same_package
           shuffleListWithSmileLast: true,
         );
@@ -176,6 +186,8 @@ void main() {
         useCustomizedLabel: true,
         mustShuffle: false,
         takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+        faceLossGraceFrames: 3,
+        frameProcessingInterval: const Duration(milliseconds: 100),
         customizedLabel: LivenessDetectionLabelModel(
           blink: 'Blink',
           lookUp: 'Look Up',
@@ -202,6 +214,8 @@ void main() {
           useCustomizedLabel: true,
           mustShuffle: false,
           takePhotoOnChallenge: LivenessDetectionStep.lookForward,
+          faceLossGraceFrames: 3,
+          frameProcessingInterval: const Duration(milliseconds: 100),
           customizedLabel: LivenessDetectionLabelModel(
             blink: 'Blink',
             lookUp: 'Look Up',

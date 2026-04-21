@@ -51,9 +51,6 @@ class LivenessDetectionView extends StatefulWidget {
 }
 
 class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
-  static const int _faceLossGraceFrames = 3;
-  static const Duration _frameProcessingInterval = Duration(milliseconds: 100);
-
   // Camera related variables
   CameraController? _cameraController;
   int _cameraIndex = 0;
@@ -287,7 +284,8 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
       return true;
     }
 
-    return now.difference(_lastFrameProcessedAt!) >= _frameProcessingInterval;
+    return now.difference(_lastFrameProcessedAt!) >=
+        widget.config.frameProcessingInterval;
   }
 
   Future<void> _processImage(InputImage inputImage) async {
@@ -306,7 +304,7 @@ class _LivenessDetectionScreenState extends State<LivenessDetectionView> {
         final bool shouldReset =
             LivenessFaceOrientationHelper.hasExceededFaceLossGracePeriod(
               faceLossFrameCount: _faceLossFrameCount,
-              gracePeriodFrames: _faceLossGraceFrames,
+              gracePeriodFrames: widget.config.faceLossGraceFrames,
             );
 
         if (shouldReset) {

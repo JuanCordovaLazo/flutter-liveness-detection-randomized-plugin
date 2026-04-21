@@ -76,7 +76,12 @@ void main() {
   group('LivenessDetectionConfig', () {
     test('accepts valid resize limits', () {
       expect(
-        LivenessDetectionConfig(maxWidth: 1024, maxHeight: 1024),
+        LivenessDetectionConfig(
+          maxWidth: 1024,
+          maxHeight: 1024,
+          faceLossGraceFrames: 3,
+          frameProcessingInterval: const Duration(milliseconds: 100),
+        ),
         isA<LivenessDetectionConfig>(),
       );
     });

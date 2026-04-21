@@ -27,6 +27,8 @@ class LivenessDetectionConfig {
   final String backButtonText;
   final String userFaceFoundText;
   final String userFaceNotFoundText;
+  final int faceLossGraceFrames;
+  final Duration frameProcessingInterval;
 
   LivenessDetectionConfig({
     this.startWithInfoScreen = false,
@@ -53,6 +55,8 @@ class LivenessDetectionConfig {
     this.backButtonText = 'Back',
     this.userFaceFoundText = 'User Face Found',
     this.userFaceNotFoundText = 'User Face Not Found...',
+    this.faceLossGraceFrames = 3,
+    this.frameProcessingInterval = const Duration(milliseconds: 100),
   }) : assert(
          !useCustomizedLabel || customizedLabel != null,
          'customizedLabel must not be null when useCustomizedLabel is true',
